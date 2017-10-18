@@ -17,7 +17,7 @@ def main():
     except subprocess.CalledProcessError:
       output = ""
 
-    if key_id.find(output) :
+    if output.find(key_id) >= 0:
       break
     subprocess.call(["ssh-add", key_file])
 
