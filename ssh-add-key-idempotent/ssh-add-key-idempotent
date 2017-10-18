@@ -7,6 +7,9 @@ import subprocess
 import sys
   
 def main():
+  if len(sys.argv) != 3:
+    usage();
+
   key_id, key_file = sys.argv[1:3]
   while True:
     try:
@@ -17,6 +20,10 @@ def main():
     if key_id.find(output) :
       break
     subprocess.call(["ssh-add", key_file])
+
+def usage():
+  print >> sys.stderr, "Usage: %s key-id key-file" % sys.argv[0]
+  exit(1)
 
 main()
   
