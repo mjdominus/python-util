@@ -1,0 +1,9 @@
+2017-10-18
+
+Replacement for
+
+	until ssh-add -l | grep -s $KEY_ID ; do
+	  ssh-add $KEY_FILE
+	done
+
+that I keep doing in scripts
