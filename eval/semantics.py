@@ -40,8 +40,17 @@ class Semantics:
   def compound_expression(self, ast):
     return ast[1]
 
+  def factor(self, ast):
+    if isinstance(ast, AST):
+      return ast.left ** ast.right
+    else:
+      return ast
+
   def number(self, ast):
-    return int(ast)
+    return float(ast)
+
+  def pi(self, ast):
+    return 3.14159;
 
   
         

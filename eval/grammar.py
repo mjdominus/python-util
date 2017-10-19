@@ -28,11 +28,17 @@ term =
        | factor
 ;
 
-factor = number | compound_expression;
+factor =
+      left:base '**' right:factor 
+    | left:base '^' right:factor
+    | base; 
+
+base = number | compound_expression;
 
 compound_expression = '(' expression ')' ;
 
-number = /\d+/;
+number = /\d+/ | pi;
+pi = 'π' | 'pi';
 
 '''
 
