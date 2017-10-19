@@ -1,0 +1,49 @@
+
+import os
+from tatsu.ast import AST
+from pprint import pprint
+
+def s(x): str(x)
+
+if 'DEBUG' in os.environ and int(os.environ['DEBUG']):
+  def debug(*strings):
+    print("".join(map(str, strings)))
+else:
+  def debug(*strings):
+    pass
+
+class Semantics:
+  def expression(self, ast):
+    debug("** expression: ", ast)
+    if isinstance(ast, AST):
+      if ast.op == '+':
+        return ast.left + ast.right
+      elif ast.op == '-':
+        return ast.left - ast.right
+      else:
+        raise Exception("WTF", ast.op)
+    else:
+      return ast
+
+  def term(self, ast):
+    debug("** term: ", ast)
+    if isinstance(ast, AST):
+      if ast.op == '*':
+        return ast.left * ast.right
+      elif ast.op == '/':
+        return ast.left / ast.right
+      else:
+        raise Exception("WTF", ast.op)
+    else:
+      return ast
+
+  def compound_expression(self, ast):
+    return ast[1]
+
+  def number(self, ast):
+    return int(ast)
+
+  
+        
+
+  

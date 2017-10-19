@@ -1,0 +1,33 @@
+#!/usr/bin/python3
+import unittest
+from grammar import Grammar
+
+class TestExprs(unittest.TestCase):
+    def setUp(self):
+        self.parser = Grammar()
+
+    def tryit(self, expr, x_res):
+        self.assertEqual(self.parser.parse(expr), x_res)
+        
+    def test_sum(self):
+        self.tryit("1+1", 2)
+        self.tryit("1+2+3", 6)
+        self.tryit("(1+2)+3", 6)
+        self.tryit("1+(2+3)", 6)
+        
+    def test_precedence(self):
+        self.tryit("3+5*4", 23);
+        self.tryit("3*5+4", 19);
+        self.tryit("3*(5+4)", 27);
+
+
+    def test_assoc(self):
+        self.tryit("8-(4-3)", 7);
+        self.tryit("(8-4)-3", 1);
+        self.tryit("100/5/2", 10);
+        self.tryit("8-4-3", 1);
+        
+
+if __name__ == '__main__':
+   unittest.main()
+

@@ -1,26 +1,16 @@
 #!/usr/bin/python3
 
-import tatsu    # parser generator library
-import pprint   # pretty-printer
-import reprlib
+from grammar import Grammar
+import sys
+import fileinput
 
-grammar = '''
-@@grammar::EVAL
+parser = Grammar()
 
-start = expression $ ;
+if (len(sys.argv) > 1):
+    print (parser.parse(" ".join(sys.argv[1:])))
+else:
+    for line in fileinput.input():
+        print (parser.parse(line))
 
-expression = number '+' expression | number;
-
-number = /\d+/;
-
-'''
-
-parser = tatsu.compile(grammar, name="eval")
-print("** compiled")
-// print(dir(parser))
-res = parser.parse("123+456")
-print("** parsed")
-print(res)
-
-
-
+        
+    
