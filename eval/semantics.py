@@ -28,9 +28,9 @@ class Semantics:
   def term(self, ast):
     debug("** term: ", ast)
     if isinstance(ast, AST):
-      if ast.op == '*':
+      if ast.op == '*' or ast.op == '×':
         return ast.left * ast.right
-      elif ast.op == '/':
+      elif ast.op == '/' or ast.op == '÷':
         return ast.left / ast.right
       else:
         raise Exception("WTF", ast.op)

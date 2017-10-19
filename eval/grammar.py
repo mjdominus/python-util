@@ -15,13 +15,16 @@ class Grammar():
 
 start = expression $ ;
 
-expression = left:term op:'+' right:expression
-           | left:term op:'-' right:expression
+expression = left:expression op:'+' right:term
+           | left:expression op:'-' right:term
            | term
 ;
 
-term =   left:factor op:'*' right:term
-       | left:factor op:'/' right:term
+term =   
+         left:term op:'*' right:factor
+       | left:term op:'×' right:factor
+       | left:term op:'/' right:factor
+       | left:term op:'÷' right:factor
        | factor
 ;
 
