@@ -1,0 +1,14 @@
+Egyptian Fraction Utilities
+Mark Jason Dominus 2017-10-20
+Programs in this directory are in the public domain.
+
+* greedy-method:
+
+  Given n and d, calculate an Egyptian fraction representation for n/d
+  using the “greedy” method
+
+* three-fractions:
+
+  Given n and d, calculate all Egyptian fraction representations for
+  n/d that have only two or three terms
+

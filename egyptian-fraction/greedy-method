@@ -1,0 +1,12 @@
+#!/usr/bin/python3
+
+import sys
+
+n, d = map(int, sys.argv[1:])
+
+while n > 0:
+  dt = 2
+  while d > n * dt: dt += 1
+  print("1 / ", dt);
+  n, d = n*dt-d , d*dt
+

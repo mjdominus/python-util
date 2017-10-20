@@ -1,0 +1,37 @@
+#!/usr/bin/python3
+#
+# Given n and d,
+#    find all p,q,r such that 1/p + 1/q + 1/r = n/d
+#
+#
+import sys
+from math import ceil 
+
+n, d = map(int, sys.argv[1:])
+
+# if we're going to add up k fractions to make n/d,
+# the smallest denominator must be at most this much
+def limit(n, d, k):
+    limit = int(k*d/n)
+    debug("limit of %d/%d (=%f) into %d parts: 1/%d" %
+          (n,d,n/d,k,limit))
+    return limit
+
+def debug(*args): pass
+
+for i in range(2, limit(n, d, 3)+1):
+    debug("* try 1/%d" % i);
+    n2, d2 = n*i-d, d*i
+    debug("* leaves %d/%d" % (n2, d2))
+    if n2 > 0 and d2 % n2 == 0 and d2/n2 > i:
+        print(">>> 1/%d + 1/%d" % (i, d2/n2))
+    for j in range(i+1, limit(n2, d2, 2)+1):
+        debug("** try 1/%d" % j);
+        n3, d3 = n2*j-d2, d2*j
+        debug("** leaves %d/%d" % (n3, d3))
+        if n3 > 0 and d3 % n3 == 0 and d3/n3 > j:
+            print(">>> 1/%d + 1/%d + 1/%d" %
+                  (i, j, d3/n3))
+
+
+
