@@ -5,7 +5,7 @@ from pprint import pprint
 
 def s(x): str(x)
 
-if 'DEBUG' in os.environ and int(os.environ['DEBUG']):
+if int(os.environ.get('DEBUG', 0)):
   def debug(*strings):
     print("".join(map(str, strings)))
 else:
