@@ -18,6 +18,13 @@ For base 37 and up, "digits" are base-10 numerals separated for dots.
 For example in base 60 the number 10,000 is written as `2.46.40` which
 means 2·3600 + 46·60 + 40.
 
+DONE
+
+Next feature:
+
+Fractions.  (I can postpone this: to calculate 1/7 base 60,
+just instead calculate floor(60^10 · 1/7) instead.)
+
 later features if needed:
 
 `-x`   if output is base 8, prefix with `0`; if output is base 16,
