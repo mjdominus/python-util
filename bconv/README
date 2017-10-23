@@ -1,0 +1,27 @@
+Convert between bases
+
+        bconv 8
+
+Input is interpreted in base 8; output is in base 10.
+
+        bconv 10 7
+
+Input is in base 10, output in base 7.
+
+Input / output formats:
+
+For base 11–36, digits are 0 … 9, A … Z as needed.
+
+Next feature:
+
+For base 37 and up, "digits" are base-10 numerals separated for dots.
+For example in base 60 the number 10,000 is written as `2.46.40` which
+means 2·3600 + 46·60 + 40.
+
+later features if needed:
+
+`-x`   if output is base 8, prefix with `0`; if output is base 16,
+prefix with `0x`.
+
+`-d`   use "dots" format for input and output even for bases 11–36.
+
