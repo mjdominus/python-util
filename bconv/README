@@ -32,3 +32,14 @@ prefix with `0x`.
 
 `-d`   use "dots" format for input and output even for bases 11–36.
 
+----------------------------------------------------------------
+
+2017-10-25: a better design:
+
+1. ONE class with "interpret" and "represent" methods
+   These objects include the delimiters or digit sets or whatever as attributes
+2. The main program instantiates TWO of these objects and glues them
+   together
+3. those options you are passing around everywhere (like digitformat)
+   become attributes in the subobjects
+
