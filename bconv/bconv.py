@@ -25,14 +25,13 @@ def main():
     else: usage()
     del argv[1:]
 
-    if ibase > 36: isep = ".";  istyle = "decimalDigits"
-    else:          isep = None; istyle = "letterDigits"
-    if obase > 36: osep = ".";  ostyle = "decimalDigits"
-    else:          osep = "";   ostyle = "letterDigits"
+    kwargs = {}
+    if ibase > 36: kwargs["isep"] = ".";  kwargs["istyle"] = "decimalDigits"
+    else:          kwargs["isep"] = None; kwargs["istyle"] = "letterDigits"
+    if obase > 36: kwargs["osep"] = ".";  kwargs["ostyle"] = "decimalDigits"
+    else:          kwargs["osep"] = "";   kwargs["ostyle"] = "letterDigits"
 
-    converter = bConv(ibase, obase,
-                      istyle=istyle, ostyle=ostyle,
-                      isep=isep, osep=osep)
+    converter = bConv(ibase, obase, **kwargs)
     
     for line in fileinput.input():
         print(converter.convert(line.rstrip()))
