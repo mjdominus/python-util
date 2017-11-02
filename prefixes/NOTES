@@ -1,0 +1,15 @@
+
+I want to find words
+
+       pqs
+       x
+       y
+
+such that:
+
+     p is a word
+     pq is a word
+     pqs is a word
+     xqs is a word
+     ys is a word
+
