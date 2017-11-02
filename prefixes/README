@@ -1,0 +1,11 @@
+
+I want to find a long (English) word W which has a prefix P which is
+also an English word, and when P is replaced by some other string (not
+necessarily a word) we get a different word.
+
+And I want this to be possible for the same W in at least two ways.
+
+And I want the results to be interesting or amusing in some way.
+
+Status: only partway there
+

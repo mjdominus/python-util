@@ -109,59 +109,39 @@ def win(pqs, pq, x, p, y):
     win.wincount += 1
     if win.wincount % 10000 == 0: print("* ", win.wincount, file=sys.stderr)
 win.wincount = 0
-    
+
+def is_boring_suffix(s):
+    for ss in ['iest', 'ness', 'tion', 'tions', 'able', 'ally', 'some', 'ment', 'ists', 'ities', 'ized', 'izes', 'izing', 'ments', 'ingly', 'sion', 'sions', 'ing']:
+        if endswith(s, ss): return True
+    return False
 
 interesting = defaultdict(int)
 count = 0
 
-for pqs in dict.keys():
-    if endswith(pqs, 'ness'): continue
-    gp = good_prefixes(pqs)
-    debug("word '%s' has good prefixes '%s'" % (pqs, repr(gp)))
-    for i in range(len(gp)-1):
-        p = gp[i]
-        for j in range(i+1, len(gp)):
-            pq = gp[j]
-            q = remove_prefix(pq, p)
-            s = remove_prefix(pqs, pq)
-            qs = remove_prefix(pqs, p)
-
-            if len(s) < 3: continue
-            if len(p) < 4: continue
-            if len(q) < 2: continue
-            
-            debug(repr(['pqs', pqs, 'pq', pq, 'q', q,
-                        's', s, 'qs', qs]))
-
-            debug("  %s is a suffix of: %s" % (qs, suffix_of[qs]))
-            debug("  %s is a suffix of: %s" % (s,  suffix_of[s]))
-            
-            if len(suffix_of[qs]) > 1 and len(suffix_of[s]) > 1:
-                for xqs in suffix_of[qs]:
-                    if xqs == pqs: continue
-                    debug("  trying '%s' which has suffix '%s'"
-                          % (xqs, qs))
-                    x = remove_suffix(xqs, qs)
-                    if not is_word(x): continue
-                    winners = []
-                    for ys in suffix_of[s]:
-                        if ys == pqs: continue
-                        if ys == xqs: continue
-                        y = remove_suffix(ys, s)
-                        if not is_word(y): continue
-                        winners += [ (pq, y) ]
-                    if len(winners) > 0:
-                        win2(pqs, p, x, winners)
-                        # win(pqs, p, x, pq, y)
-                        # k = ",".join([pqs,p,pq])
-                        # if k in interesting:
-                        #     interesting[k] += 1
-                        # else:
-                        #     print("*  ", k)
-                        #     interesting[k] = 1
-                        # count += 1
-                        # if count % 100000 == 0: print(count, file=sys.stderr)
-
-for k in interesting.keys():
-    print("%4d %-20s" % (interesting[k], k))
+for word in sorted(dict.keys()):
+    gp = good_prefixes(word)
+    if len(gp) < 2: continue
+    debug("word '%s' has good prefixes '%s'" % (word, repr(gp)))
+    winners = defaultdict(list)
     
+    for p in gp:
+        s = remove_prefix(word, p)
+        if len(s) < 4: continue
+        if is_boring_suffix(s): continue
+        debug("  %s is a suffix of: %s" % (s, suffix_of[s]))
+            
+        if len(suffix_of[s]) > 1:
+            for xs in suffix_of[s]:
+                if xs == word: continue
+                x = remove_suffix(xs, s)
+                if re.match(r's$', p) and re.match(r's$', x): continue
+                if len(x) < 4: continue
+                if not is_word(x): continue
+                winners[p] += [x]
+
+        if len(winners.keys()) > 1:
+            print("** %s" % word)
+            for p in sorted(winners.keys()):
+                for x in sorted(winners[p]):
+                    print("   [ %-10s -> %-10s ] %-20s" %
+                          ( p, x, replace(word, p, x) ))

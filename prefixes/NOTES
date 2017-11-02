@@ -13,3 +13,29 @@ such that:
      xqs is a word
      ys is a word
 
+Don't need to find x and y independently.  Just for each word pqs,
+find (pq, x) pairs and record all such.  Then if there are two pqs of
+different lengths, we win; dump out all the pairs.
+
+Maybe:
+
+  68 forestalling,fore,forest
+   3 demonstrative,demo,demons
+   4 parentheses,pare,parent
+
+Better:
+
+** anticipate
+   [ ant        -> part       ] participate         
+   [ antic      -> diss       ] dissipate           
+
+** pertains
+   [ per        -> bloods     ] bloodstains         
+   [ per        -> chief      ] chieftains          
+   [ per        -> enter      ] entertains          
+   [ per        -> main       ] maintains           
+   [ per        -> plan       ] plantains           
+   [ pert       -> curt       ] curtains            
+   [ pert       -> fount      ] fountains           
+   [ pert       -> mount      ] mountains           
+   [ pert       -> plant      ] plantains           
