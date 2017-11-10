@@ -7,3 +7,24 @@ Replacement for
 	done
 
 that I keep doing in scripts
+
+2017-11-10
+
+This needs an improvement.  Suppose file A contains key A' and file B
+contains key B'.  Then we can load these with
+
+         ssh-add-key-idempotent A' A
+         ssh-add-key-idempotent B' B
+
+Fine.  But if both files have the same passphrase, we have to type the
+passphrase twice; just using `ssh-add A B` would reuse the passphrase
+if possible.
+
+So we should extend the command to take multiple ID-file pairs:
+
+         ssh-add-key-idempotent A' A B' B
+
+This should first determine which subset of {A', B'} needs to be
+loaded, and then instead of calling `ssh-add` repeatedly, once for
+each file, it should call `ssh-add` once on the entire subset of
+files.
