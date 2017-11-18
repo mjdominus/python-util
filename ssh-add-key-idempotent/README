@@ -28,3 +28,7 @@ This should first determine which subset of {A', B'} needs to be
 loaded, and then instead of calling `ssh-add` repeatedly, once for
 each file, it should call `ssh-add` once on the entire subset of
 files.
+
+2017-11-18
+
+The improvement described in the previous note has been added

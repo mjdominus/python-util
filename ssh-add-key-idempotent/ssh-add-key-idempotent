@@ -5,24 +5,38 @@
 
 import subprocess
 import sys
-  
+
 def main():
-  if len(sys.argv) != 3:
-    usage();
+  if len(sys.argv) % 2 == 0 or len(sys.argv) < 2:
+    usage()
 
-  key_id, key_file = sys.argv[1:3]
-  while True:
-    try:
-      output = subprocess.check_output(["ssh-add", "-l"])
-    except subprocess.CalledProcessError:
-      output = ""
+  try:
+    output = subprocess.check_output(["ssh-add", "-l"])
+  except subprocess.CalledProcessError:
+    output = ""
 
-    if output.find(key_id) >= 0:
-      break
-    subprocess.call(["ssh-add", key_file])
 
+  # these are the keys and files we actually need to look at
+  # It's important to preserve the order they are supplied
+  # because ssh-add will retry the previous passphrase for
+  # each file
+  to_do = []
+  seen = {}
+  for key_id, key_file in iterpairs(sys.argv[1:]):
+    if output.find(key_id) < 0: # not found
+      if not seen.get(key_file, False):
+        to_do.append(key_file);
+        seen[key_file] = True
+
+  if len(to_do) > 0:
+    subprocess.call(["ssh-add"] + to_do)
+
+def iterpairs(ls):
+  for a, b in zip(ls[0::2], ls[1::2]):
+    yield (a, b)
+    
 def usage():
-  print >> sys.stderr, "Usage: %s key-id key-file" % sys.argv[0]
+  print >> sys.stderr, "Usage: %s [key-id key-file]..." % sys.argv[0]
   exit(1)
 
 main()
