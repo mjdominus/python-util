@@ -1,0 +1,15 @@
+#!/usr/bin/python3
+#
+
+import datetime
+from sys import stderr
+import os
+
+steam_path = '/usr/bin/steam'
+hour = datetime.datetime.now().hour
+if hour >= 9 and hour <= 17:
+    print("No Steam during work hours!", file=stderr)
+    exit(os.EX_NOPERM)
+else:
+    os.execl(steam_path, "steam") # raises exception on failure
+
