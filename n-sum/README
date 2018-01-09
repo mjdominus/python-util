@@ -1,0 +1,24 @@
+QUESTION: Say a set of numbers is GOOD if it contains a d-element subset
+          whose sum is a multiple of d.
+
+Let n(d) be the smallest number for which EVERY set of n(d) integers is GOOD.
+
+For d=0,1,2,3 we have n(d)=0,1,3,5.  What is n(4)?
+
+Idea:
+
+1. Enumerate all possible unordered d-sets of {0, ... d-1}.
+   Queue the bad ones and index the good ones.
+
+2. The queue will produce *all* the examples of bad sets.
+   While there is an item in the queue:
+     Try augmenting the item with each of <0, 1, ..., d-1>.
+     Check if the augmented item is good.
+     If it's bad, queue it.
+
+3. The big question is how to quickly check if the augmented item is
+   good. For now, we can do it just by brute force.
+   In the existing program. this is just numset.is_good()
+
+
+
