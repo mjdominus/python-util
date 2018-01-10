@@ -92,7 +92,8 @@ class search():
             if self.already_saw(node): continue
             node_numset = numset(self.target, node)
             if node_numset.is_good(): continue
-            if not callback is None: callback(node)
+            if not callback is None and len(node) >= self._maxsize:
+                callback(sorted(node))
             self._maxsize = max(self._maxsize, len(node))
             self.queue.extend([ node_numset.extend(i).nums for i in self.items ])
 
