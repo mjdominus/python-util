@@ -113,7 +113,20 @@ class search():
     def print_bad(self):
         self.find_bad(callback=print)
 
-d = 4
-x = search(d)
-x.print_bad()
-print("n(%d) = %d"% (d, x.maxsize() + 1))
+def main():
+    d = None
+    if len(argv) == 2:
+        d = int(argv[1])
+    else:
+        usage();
+    x = search(d)
+    x.print_bad();
+    print("n(%d) = %d"% (d, x.maxsize() + 1), file=stderr)
+
+def usage():
+    print("Usage: nsum d", file=stderr)
+    exit(2)
+
+if __name__ == '__main__':
+    from sys import stderr, argv
+    main()
