@@ -22,6 +22,9 @@ class numset():
         self.target = target
         self.subsize = numset.default(subsize, target)
 
+    def __hash__(self):
+        str(sorted(self.nums))
+        
     def default(x, y):
         if x is None: return y
         else: return x
@@ -80,16 +83,26 @@ class search():
         self.target = d
         self.queue = list(unordered_sets(d, range(d)))
         self._maxsize = None
+        self.seen = {}
 
     def find_bad(self, callback=None):
         self._maxsize = 0
         while len(self.queue) > 0:
             node = self.queue.pop()
+            if self.already_saw(node): continue
             node_numset = numset(self.target, node)
             if node_numset.is_good(): continue
             if not callback is None: callback(node)
             self._maxsize = max(self._maxsize, len(node))
             self.queue.extend([ node_numset.extend(i).nums for i in self.items ])
+
+    def already_saw(self, node):
+        key = str(sorted(node))
+        if self.seen.get(key, None) is None:
+            self.seen[key] = 1
+            return False
+        else:
+            return True
 
     def maxsize(self):
         if self._maxsize is None:
