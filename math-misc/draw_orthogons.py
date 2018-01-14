@@ -6,13 +6,11 @@ from orthogon import svg_drawing
 def draw_orthogon(file, args):
     draw = svg_drawing()
     for arg in args:
-        if arg.startswith("r"):
-            draw.right()
-        elif arg.startswith("l"):
-            draw.left()
-        elif arg.startswith("f"):
-            draw.step()
-        else: raise Exception("Unknown instruction '%s' in line '%s'" % (arg. file))
+        for ch in list(arg):
+            if   ch == 'r': draw.right()
+            elif ch == 'l': draw.left()
+            elif ch == 'f': draw.step()
+            else: raise Exception("Unknown instruction '%s' in line '%s'" % (arg, file))
         
     draw.file = open(file, mode="w")
     draw.output()
