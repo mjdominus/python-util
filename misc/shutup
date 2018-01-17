@@ -1,0 +1,28 @@
+#!/usr/bin/python3
+
+import sys
+import os
+
+def run_with_shut_up(command, *args, stdout=True, stderr=False):
+    devnull = open("/dev/null")
+    if not stdout:
+        os.dup2(devnull.fileno(), 1)
+    if not stderr:
+        os.dup2(devnull.fileno(), 2)
+    os.execlp(command, command, *args)
+
+def usage():
+    print("Usage: shutup [-a] command args...",
+          file=sys.stderr)
+    exit(2)
+
+if __name__ == '__main__':
+    from sys import argv
+    show_stdout = True
+    argv=argv[1:]
+    if len(argv) == 0: usage()
+    elif argv[0] == '-a':
+        show_stdout = False
+        argv = argv[:]
+    run_with_shut_up(*argv, stdout=show_stdout)
+    
