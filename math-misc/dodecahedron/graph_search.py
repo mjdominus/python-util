@@ -116,18 +116,16 @@ class graph_search:
                 yield [ source, *partial_path ]
         return;
 
+from collections import defaultdict
+
 if __name__ == '__main__':
-    count = []
+    count = defaultdict(int)
     total = 0
     for path in graph_search(dodecahedron).paths(1, 20, maxlen = 12, simple=False):
         print(path)
-        ln = len(path)-1
-        while (len(count) < ln+1): # must be a better way to do this
-            count.append(0)
-        count[ln] += 1
+        count[len(path)-1] += 1
         total += 1
-    for i in range(len(count)):
-        if count[i] > 0:
-            print("%3d %4d" % (i, count[i]))
+    for i in sorted(list(count.keys())):
+        print("%3d %8d" % (i, count[i]))
     print("Total", total)
     
