@@ -1,0 +1,10 @@
+Paths on a dodecahedron
+
+https://math.stackexchange.com/questions/2577433/paths-on-a-dodecahedron
+asks how many paths there are between two opposite vertices?
+
+They want not-necessarily-simple paths, which might be easier than
+counting simple paths because
+of symmetry even though the numbers are larger.  Maybe try both.
+
+
