@@ -1,0 +1,49 @@
+#!/usr/bin/python3
+
+from sys import argv
+from pathlib import Path
+from os import rename
+
+## Todo: extract this into separate module
+class sequence():
+    def __init__(self, pat="%s"):
+        self.pat = pat
+        self.cur = [0]
+        self.maxv = 26
+        self.smap = dict(zip(range(self.maxv),
+                             [ chr(n + ord('a')) for n in range(self.maxv) ]))
+
+    def __iter__(self):
+        return self
+
+    def __next__(self):
+        ret = self.to_string()
+        for i in range(len(self.cur)):
+            self.cur[i] += 1
+            if self.cur[i] < self.maxv:
+                break
+            else:
+                self.cur[i] = 0
+        else:
+            self.cur.append(0)
+        return ret
+        
+
+    def to_string(self):
+        z = [ self.smap[i] for i in self.cur ]
+        z.reverse()
+        # This doesn't handle a %% escape also
+        # and can't be made to; need another technique
+        # need to fix it
+        return self.pat.replace("%s", "".join(z))
+        
+## Todo: Allow printf-style substitution so I can
+## rename to a sequence like "a.jpg", "b.jpg"
+seq = sequence(pat='%s.jpg')
+for source in argv[1:]:
+    target_file = None
+    while True:
+        target_file = seq.__next__();
+        if not Path(target_file).exists(): break
+    rename(source, str(target_file))
+

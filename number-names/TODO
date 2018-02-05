@@ -1,0 +1,13 @@
+
+o Split off sequence-generating class into module
+
+o Pass `pat` option from command line to sequence constructor
+
+o Support `%%` escapes in sequence generator
+
+o Support multiple sequence types:  capital letters, numbers,
+  arbitrary thingies
+
+o --dry-run flag
+
+
