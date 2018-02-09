@@ -1,0 +1,61 @@
+#!/usr/bin/python3
+
+# This thing implements a graph
+#  (it happens to be the petersen graph, but whatever)
+# search() starts at the specified vertex and
+#  tries to greedily find the longest possible path
+#  (that is, at each step, it moves to the first unused vertex)
+#
+# Because the PG is so symmetrical, it finds a 9-cycle regardless
+# of where you start
+
+class agraph():
+    vertices = [ '012', '013', '014',
+                 '023', '024', '034',
+                 '123', '124', '134', '234' ]
+
+    def to_vec(self, v):
+        vec = [0] * 5
+        for d in list(v): vec[int(d)] = 1
+        return vec
+
+    def from_vec(self, v):
+        s = ""
+        for n in range(len(v)):
+            if v[n] > 0: s += str(n)
+        return s
+
+    def adjacent(self, a, b):
+        (av, bv) = (self.to_vec(a), self.to_vec(b))
+        count = 0
+        for n in range(len(av)):
+            if av[n] == 1 and bv[n] == 1: count += 1
+        return count == 1
+
+    def search(self, cur, path=[]):
+        path.append(cur)
+        for v in self.vertices:
+            if v not in path and self.adjacent(cur, v):
+                return self.search(v, path)
+
+        if self.adjacent(path[0], path[-1]):
+            return [ *path, "!!" ]
+        else: return path
+                
+        
+    def test(self):
+#        print(self.to_vec("134"))
+#        print(self.from_vec([0, 1, 1, 0, 1]))
+        for v in self.vertices:
+            for w in self.vertices:
+                if self.adjacent(v, w):
+                    print(v, "--", w)
+                else: 
+                    print(v, "  ", w)
+
+
+#print(agraph().search("134", path=["012"]))
+print(agraph().search("012"))
+
+        
+    
