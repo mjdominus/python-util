@@ -1,0 +1,23 @@
+A billing DB has the following columns:
+
+Supplied by ABC:
+
+    Claim number (opaque string)
+    Date of service
+    Patient ID (string)
+    Type
+    Doctor/Facility
+    Total charges
+    Member responsibility
+    Status
+    (EOB form) (do not import, useless)
+
+I should add:
+
+    Status   (None, paid)
+    Date paid
+    Check number
+    Check amount
+
+
+    
