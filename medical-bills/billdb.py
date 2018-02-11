@@ -1,6 +1,7 @@
 
 # import html.parser
 import xml.etree.ElementTree as ET
+import yaml
 
 class billdb():
     def __init__(self, file, rdonly=False, debug=False):
@@ -32,24 +33,38 @@ class billdb():
             raise Exception("Can't import into read-only database")
         f = self.maybe_open_file(xmlfile, mode='r')
         self.tree = self.parser.parse(f)
-        for row in self.root():
-            self.addrow(row)
+        count = 0
+        for xml in self.root():
+            if self.skippable_xml(xml): continue
+            self.add_record(self.xml_to_record(xml))
+            count += 1
         if self.debug:
-            print("Loaded", len(self.db), "row(s)")
+            print("Loaded", count, "row(s); total",
+                  len(self.db), "row(s)")
         return self
 
     def load(self):
-        pass
+        db = yaml.loader.Loader(self.file).get_data()
+        for key, rec in db.items():
+            if "claim_number" in rec:
+                if rec["claim_number"] != key:
+                    raise Exception("database claim number mismatch! (%s != %s)" % (rec["claim_number"], key))
+            else:
+                rec["claim_number"] = key
+
+        self.db = db
+        return self
 
     def save(self):
         if self.rdonly:
             raise Exception("Can't save to read-only database")
+        return self
 
-    def skippable_row(self, row):
+    def skippable_xml(self, xml):
         # we expect there to be a row of TH cells
         # at the top of the input
-        if row.tag.lower() == 'tr':
-            for child in row:
+        if xml.tag.lower() == 'tr':
+            for child in xml:
                 if child.tag.lower() != 'th':
                     return False
             return True
@@ -58,8 +73,7 @@ class billdb():
         
     # row is an Element object, should be
     # a TR element containing TD subelements
-    def addrow(self, row):
-        if self.skippable_row(row): return
+    def xml_to_record(self, row):
         if row.tag.lower() != 'tr':
             raise Exception("Row had tag '" + row.tag +
                             "' instead of expected TR");
@@ -80,12 +94,16 @@ class billdb():
         rec["check_number"] = None
         rec["check_amount"] = None
 
+        return rec
+
+    def add_record(self, rec):
+        claim_number = rec["claim_number"]
         if self.db.get(claim_number) is not None:
             self.merge_record(claim_number, rec)
             return
         else:
             self.db[claim_number] = rec
-
+    
     def get_claim(self, claim_number):
         self.db.get(claim_number)
 
@@ -117,7 +135,7 @@ class billdb():
         return "".join(elem.itertext())
 
 if __name__ == '__main__':
-    bdb = billdb("samples/empty.bdb", debug=True)
+    bdb = billdb("samples/arec.bdb", debug=True)
     bdb.import_xml("samples/a.xls")
     from pprint import pprint as pp
     pp(vars(bdb))
