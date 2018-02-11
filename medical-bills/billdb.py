@@ -3,29 +3,47 @@
 import xml.etree.ElementTree as ET
 
 class billdb():
-    def __init__(self, file, rdonly=False,
-                 debug=False):
-        self.rdonly = rdonly
-        self.path = file
+    def __init__(self, file, rdonly=False, debug=False):
         self.debug = debug
+        self.rdonly = rdonly
+        self.file = self.maybe_open_file(file)
         self.parser = ET
         self.tree = None
         self.db = {}
-        self.openfile()
+        self.load()
 
-    def openfile(self):
-        if self.path is None: self.fail("omitted file argument")
-        mode = 'r+'
-        if self.rdonly: mode = 'r'
-        self.f = open(self.path, mode=mode)
-        self.loadfile()
+    def mode(self):
+        if self.rdonly: return "r"
+        else: return "r+"
 
-    def loadfile(self):
-        self.tree = self.parser.parse(self.f)
+    def maybe_open_file(self, path_or_file, mode=None):
+        if mode is None: mode = self.mode()
+        file = path_or_file
+        try:
+            # see if it's actually a path
+            file = open(path_or_file, mode=mode)
+        except TypeError:
+            # If not, it should be something that works like a file
+            pass
+        return file
+
+    def import_xml(self, xmlfile):
+        if self.rdonly:
+            raise Exception("Can't import into read-only database")
+        f = self.maybe_open_file(xmlfile, mode='r')
+        self.tree = self.parser.parse(f)
         for row in self.root():
             self.addrow(row)
         if self.debug:
             print("Loaded", len(self.db), "row(s)")
+        return self
+
+    def load(self):
+        pass
+
+    def save(self):
+        if self.rdonly:
+            raise Exception("Can't save to read-only database")
 
     def skippable_row(self, row):
         # we expect there to be a row of TH cells
@@ -80,7 +98,6 @@ class billdb():
         raise Exception("Duplicate record: claim number " +
                         id);
         
-        
     def unpack_td(self, elem):
         s = str(ET.tostring(elem))
         text = self.alltext(elem)
@@ -100,6 +117,7 @@ class billdb():
         return "".join(elem.itertext())
 
 if __name__ == '__main__':
-    bdb = billdb("samples/a.xls", debug=True)
+    bdb = billdb("samples/empty.bdb", debug=True)
+    bdb.import_xml("samples/a.xls")
     from pprint import pprint as pp
     pp(vars(bdb))
