@@ -1,3 +1,4 @@
+#!/usr/bin/python3
 
 # import html.parser
 import xml.etree.ElementTree as ET
@@ -19,7 +20,6 @@ class billdb():
             self.backupfile = backupfile
         self.open_file(self.path)
         self.parser = ET
-        self.tree = None
         self.db = {}
         self.load()
 
@@ -32,21 +32,25 @@ class billdb():
         self.file = open(path, mode=mode)
 
     def import_xml(self, xmlfile):
+        if self.debug: print("Importing from", xmlfile)
+        tree = None
         if self.rdonly:
             raise Exception("Can't import into read-only database")
-        f = open(xmlfile, mode='r')
-        self.tree = self.parser.parse(f)
+        with open(xmlfile, mode='r') as f:
+            tree = self.parser.parse(f)
+
         count = 0
-        for xml in self.root():
+        for xml in tree.getroot():
             if self.skippable_xml(xml): continue
             self.add_record(self.xml_to_record(xml))
             count += 1
         if self.debug:
-            print("Loaded", count, "row(s); total",
-                  len(self.db), "row(s)")
+            print("  Imported", count, "record(s); total",
+                  len(self.db), "record(s)")
         return self
 
     def load(self):
+        if self.debug: print("Loading from", self.path)
         db = yaml.loader.Loader(self.file).get_data()
         for key, rec in db.items():
             if "claim_number" in rec:
@@ -56,6 +60,7 @@ class billdb():
                 rec["claim_number"] = key
 
         self.db = db
+        if self.debug: print("  Loaded", len(self.db), "record(a)s")
         return self
 
     # Trying hard to do this safely
@@ -71,8 +76,8 @@ class billdb():
 
     def save_copy(self, target_path):
         import sys
-        f = open(target_path, mode="w")
-        yaml.dump(self.db, f, default_flow_style=False)
+        with open(target_path, mode="w") as f:
+            yaml.dump(self.db, f, default_flow_style=False)
         return self
 
     def skippable_xml(self, xml):
@@ -142,9 +147,6 @@ class billdb():
         
     def fail(self, msg):
         raise Exception("billdb: " + msg)
-
-    def root(self):
-        return self.tree.getroot()
 
     def alltext(self, elem):
         return "".join(elem.itertext())

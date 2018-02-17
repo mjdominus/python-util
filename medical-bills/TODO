@@ -1,13 +1,18 @@
 
+o Merge records when consistent!
+
 o Advisory locking
+    Do this later, you're the only one using this program
+    
 o `pay-bill` utility program
   o It can raise a flag: "hey, you already paid this!"
+
 o Better field loading:
   o Parse dates as dates
   o Strip quotes from claim numbers
   o Translate patient IDs?
 
-o Don't let file objects go out of scope; use the
+* Don't let file objects go out of scope; use the
         with open(...) as f:
   pattern
 
