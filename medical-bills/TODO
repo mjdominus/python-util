@@ -6,7 +6,11 @@ o Advisory locking
     Do this later, you're the only one using this program
     
 o `pay-bill` utility program
-  o It can raise a flag: "hey, you already paid this!"
+  * It can raise a flag: "hey, you already paid this!"
+  o Needs better lookup mechanisms:
+    o Claim number prefix or suffix
+    o Date of service (with menu for ambiguous claims)
+    o Doctor substring match (ditto)
 
 * Better field loading:
   * This is in progress -- we now have an "xml_conversions"

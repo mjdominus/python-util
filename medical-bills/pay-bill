@@ -1,0 +1,53 @@
+#!/usr/bin/python3
+
+from billdb import billdb
+from sys import argv, stdin
+import datetime
+
+def prompt(prompt, default=None):
+   if default is not None:
+      prompt = prompt + "[" + default + "] "
+   while True:
+      print(prompt, end="", flush=True)
+      res = stdin.readline().strip()
+      if res == "":
+         if default is not None: return default
+      else:
+         return res
+
+def print_claim(rec):
+   print(rec["claim_number"], "for", rec["for"]);
+   print(rec["doctor"], rec["date_service"]);
+   print("  Billed: $" + rec["total"])
+   print("    Owed: $" + rec["payable"])
+   print("STATUS:", rec["mystatus"])
+   
+   
+database_file = "/home/mjd/private/anthem.bdb"
+database_file = "samples/test.bdb"
+if len(argv) > 2:
+   usage()
+elif len(argv) == 2:
+   database_file = argv[1]
+
+bdb = billdb(database_file)
+
+while True:
+   claim_number = prompt("Claim number? ")
+   if claim_number in bdb.db: break
+   print("Unrecognized claim number")
+   
+rec = bdb.db[claim_number]
+print_claim(rec)
+if rec["mystatus"] == "paid":
+   print("** You already paid this claim!")
+   print("  (Check number", rec["check_number"], "on",
+         rec["date_paid"] + ")")
+   exit(1)
+
+rec["check_amount"] = prompt("Amount paid? ", rec["payable"])
+rec["date_paid"]    = prompt("Date paid? ", str(datetime.date.today()))
+rec["check_number"] = prompt("Check number? ")
+rec["mystatus"]     = prompt("New status? ", "paid")
+   
+bdb.save()
