@@ -1,16 +1,12 @@
-#!/usr/bin/python3
-
-# import html.parser
 from billdb.anthem_xml_importer import anthem_xml_importer
 from billdb.resolver import resolver, ResolutionException
 import yaml
 import os
 
 class billdb():
-
     def __init__(self, path, rdonly=False, debug=False, tmpfile=None, backupfile=None,
-                 xml_importer=None,
-                 conflict_resolver=None):
+                 xml_importer=anthem_xml_importer(),
+                 conflict_resolver=resolver()):
         if backupfile is None:
             self.backupfile = path + ".bkp"
         else:
@@ -111,11 +107,3 @@ class billdb():
                 print("  %s: %d; " % (k, status[k]), end="")
             print()
         return self
-
-if __name__ == '__main__':
-    bdb = billdb("samples/arec.bdb", debug=True,
-                 xml_importer=anthem_xml_importer(debug=False),
-                 conflict_resolver=resolver()) \
-        .import_xml("samples/a.xls").save()
-#    from pprint import pprint as pp
-#    pp(vars(bdb))
