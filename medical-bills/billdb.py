@@ -6,7 +6,13 @@ import yaml
 import os
 
 class billdb():
+
+    # How to resolve merge conflicts in records
+    # see resolve_conflict_for()
+    resolutions = { }
+
     def __init__(self, path, rdonly=False, debug=False, tmpfile=None, backupfile=None):
+        self.resolutions = self.__class__.resolutions
         self.debug = debug
         self.rdonly = rdonly
         self.path = path
@@ -40,12 +46,14 @@ class billdb():
             tree = self.parser.parse(f)
 
         count = 0
+        merged = 0
         for xml in tree.getroot():
             if self.skippable_xml(xml): continue
-            self.add_record(self.xml_to_record(xml))
+            merged += self.add_record(self.xml_to_record(xml))
             count += 1
         if self.debug:
-            print("  Imported", count, "record(s); total",
+            print("  Imported", count, "record(s); merged",
+                  str(merged) + ";", "total",
                   len(self.db), "record(s)")
         return self
 
@@ -120,9 +128,10 @@ class billdb():
         claim_number = rec["claim_number"]
         if self.db.get(claim_number) is not None:
             self.merge_record(claim_number, rec)
-            return
+            return 1
         else:
             self.db[claim_number] = rec
+            return 0
     
     def get_claim(self, claim_number):
         self.db.get(claim_number)
@@ -132,9 +141,40 @@ class billdb():
 
     # Here we are presented with a new record
     # that has the same ID as an old record
-    def merge_record(self, id, rec):
-        raise Exception("Duplicate record: claim number " +
-                        id);
+    # Throws exception if it can't merge
+    def merge_record(self, id, new):
+        old = self.db[id]
+        merged = old.copy()
+        # What can be merged?
+        # Anything in the new record that is absent from the old is okay
+        # Anything in the new record that exactly matches the old is okay
+        # Anything missing from the new record that is in the old is okay
+        # None values in the new record can be ignored, None in the old record overwritten
+        # And there are a few special exceptions:
+        #   Some status fields can be updated from new to old
+        #   Conceivably some information can be ignored in new when it mismatches
+        #   The DB object can have a resolution policy
+        for key, val in new.items():
+            if key not in merged or merged[key] is None:
+                merged[key] = val
+            elif val is None or val == merged[key]:
+                pass
+            else:
+                merged[key] = self.resolve_conflict_for(key, merged, new)
+        return merged
+
+    def resolve_conflict_for(self, key, old, new):
+        try: resolution = self.resolutions[key]
+        except KeyError:
+            raise Exception("Conflict in '%s' field: old value <%s>, new value <%s>" % (key, old[key], new[key]))
+        if resolution == "update":
+            return new[key]
+        elif resolution == "ignore":
+            return old[key]
+        elif "__call__" in dir(resolution):
+            return resolution.__call__(old, new)
+        else:
+            raise Exception("Unknown resolution '%s' for key '%s'" % (resolution, key))
         
     def unpack_td(self, elem):
         s = str(ET.tostring(elem))
