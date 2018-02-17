@@ -1,6 +1,6 @@
 
 * Merge records when consistent!
-  o Move the merging logic into a separate object
+  * Move the merging logic into a separate object
 
 o Advisory locking
     Do this later, you're the only one using this program
