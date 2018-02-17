@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 
 # import html.parser
-import xml.etree.ElementTree as ET
+from billdb.anthem_xml_importer import anthem_xml_importer
 import yaml
 import os
 
@@ -9,24 +9,30 @@ class billdb():
 
     # How to resolve merge conflicts in records
     # see resolve_conflict_for()
+    #
+    # elements here can be "update", "ignore", or
+    # a function that takes old and new values and
+    # returns the merged result
     resolutions = { }
 
-    def __init__(self, path, rdonly=False, debug=False, tmpfile=None, backupfile=None):
-        self.resolutions = self.__class__.resolutions
-        self.debug = debug
-        self.rdonly = rdonly
-        self.path = path
-        if tmpfile is None:
-            self.tmpfile = path + ".tmp"
-        else:
-            self.tmpfile = tmpfile
+    def __init__(self, path, rdonly=False, debug=False, tmpfile=None, backupfile=None,
+                 xml_importer=None):
         if backupfile is None:
             self.backupfile = path + ".bkp"
         else:
             self.backupfile = backupfile
-        self.open_file(self.path)
-        self.parser = ET
         self.db = {}
+        self.debug = debug
+        self.path = path
+        self.rdonly = rdonly
+        self.resolutions = self.__class__.resolutions
+        if tmpfile is None:
+            self.tmpfile = path + ".tmp"
+        else:
+            self.tmpfile = tmpfile
+        self.xml_importer = xml_importer
+
+        self.open_file(self.path)
         self.load()
 
     def mode(self):
@@ -36,26 +42,6 @@ class billdb():
     def open_file(self, path, mode=None):
         if mode is None: mode = self.mode()
         self.file = open(path, mode=mode)
-
-    def import_xml(self, xmlfile):
-        if self.debug: print("Importing from", xmlfile)
-        tree = None
-        if self.rdonly:
-            raise Exception("Can't import into read-only database")
-        with open(xmlfile, mode='r') as f:
-            tree = self.parser.parse(f)
-
-        count = 0
-        merged = 0
-        for xml in tree.getroot():
-            if self.skippable_xml(xml): continue
-            merged += self.add_record(self.xml_to_record(xml))
-            count += 1
-        if self.debug:
-            print("  Imported", count, "record(s); merged",
-                  str(merged) + ";", "total",
-                  len(self.db), "record(s)")
-        return self
 
     def load(self):
         if self.debug: print("Loading from", self.path)
@@ -68,7 +54,7 @@ class billdb():
                 rec["claim_number"] = key
 
         self.db = db
-        if self.debug: print("  Loaded", len(self.db), "record(a)s")
+        if self.debug: print("  Loaded", len(self.db), "record(s)")
         return self
 
     # Trying hard to do this safely
@@ -83,46 +69,10 @@ class billdb():
         os.rename(self.tmpfile, self.path)
 
     def save_copy(self, target_path):
-        import sys
+        
         with open(target_path, mode="w") as f:
             yaml.dump(self.db, f, default_flow_style=False)
         return self
-
-    def skippable_xml(self, xml):
-        # we expect there to be a row of TH cells
-        # at the top of the input
-        if xml.tag.lower() == 'tr':
-            for child in xml:
-                if child.tag.lower() != 'th':
-                    return False
-            return True
-        else:
-            return False
-        
-    # row is an Element object, should be
-    # a TR element containing TD subelements
-    def xml_to_record(self, row):
-        if row.tag.lower() != 'tr':
-            raise Exception("Row had tag '" + row.tag +
-                            "' instead of expected TR");
-        
-        claim_number = self.unpack_td(row[0])
-        rec = { "claim_number": claim_number }
-
-        rec["date"]         = self.unpack_td(row[1])
-        rec["for"]          = self.unpack_td(row[2])
-        rec["type"]         = self.unpack_td(row[3])
-        rec["doctor"]       = self.unpack_td(row[4])
-        rec["total"]        = self.unpack_td(row[5])
-        rec["payable"]      = self.unpack_td(row[6])
-        rec["status"]       = self.unpack_td(row[7])
-
-        rec["mystatus"]     = None
-        rec["date_paid"]    = None
-        rec["check_number"] = None
-        rec["check_amount"] = None
-
-        return rec
 
     def add_record(self, rec):
         claim_number = rec["claim_number"]
@@ -176,23 +126,21 @@ class billdb():
         else:
             raise Exception("Unknown resolution '%s' for key '%s'" % (resolution, key))
         
-    def unpack_td(self, elem):
-        s = str(ET.tostring(elem))
-        text = self.alltext(elem)
-        if elem.tag != 'TD':
-            raise Exception("element '" + s + "' has tag '" + elem.tag + "' instead of TD")
-        elif text is None:
-            raise Exception("element '" + s + "' has no text")
-        return text
-        
-    def fail(self, msg):
-        raise Exception("billdb: " + msg)
-
-    def alltext(self, elem):
-        return "".join(elem.itertext())
+    def import_xml(self, xml_file):
+        if self.rdonly:
+            raise Exception("Can't import into read-only database")
+        recs = self.xml_importer.import_xml(xml_file)
+        merged = 0
+        for rec in recs:
+            merged += self.add_record(rec)
+        if self.debug:
+            print("  Added %d new record(s), merged %d" %
+                  ( len(recs) - merged, merged ))
+        return self
 
 if __name__ == '__main__':
-    bdb = billdb("samples/arec.bdb", debug=True) \
+    bdb = billdb("samples/arec.bdb", debug=True,
+                 xml_importer=anthem_xml_importer(debug=False)) \
         .import_xml("samples/a.xls").save()
 #    from pprint import pprint as pp
 #    pp(vars(bdb))
