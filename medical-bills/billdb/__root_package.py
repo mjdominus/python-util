@@ -37,11 +37,11 @@ class billdb():
         if self.debug: print("Loading from", self.path)
         db = yaml.loader.Loader(self.file).get_data()
         for key, rec in db.items():
-            if "claim_number" in rec:
-                if rec["claim_number"] != key:
-                    raise Exception("database claim number mismatch! (%s != %s)" % (rec["claim_number"], key))
+            if "claim_id" in rec:
+                if rec["claim_id"] != key:
+                    raise Exception("database claim ID mismatch! (%s != %s)" % (rec["claim_id"], key))
             else:
-                rec["claim_number"] = key
+                rec["claim_id"] = key
 
         self.db = db
         if self.debug: print("  Loaded", len(self.db), "record(s)")
@@ -65,21 +65,21 @@ class billdb():
         return self
 
     def add_record(self, rec):
-        claim_number = rec["claim_number"]
-        if self.db.get(claim_number) is not None:
-            if (self.merge_record(claim_number, rec)):
+        claim_id = rec["claim_id"]
+        if self.db.get(claim_id) is not None:
+            if (self.merge_record(claim_id, rec)):
                 return "merged"
             else:
                 return "failed"
         else:
-            self.db[claim_number] = rec
+            self.db[claim_id] = rec
             return "added"
     
-    def get_claim(self, claim_number):
-        self.db.get(claim_number)
+    def get_claim(self, claim_id):
+        self.db.get(claim_id)
 
-    def has_claim(self, claim_number):
-        return claim_number in self.db
+    def has_claim(self, claim_id):
+        return claim_id in self.db
 
     # Here we are presented with a new record
     # that has the same ID as an old record

@@ -37,7 +37,7 @@ class anthem_xml_importer(xml_importer):
             raise Exception("Unexpected claimant <%s>" % s)
         
     conversions = {
-        "claim_number": stripquotes,
+        "claim_id": stripquotes,
         "payable": money,
         "total": money,
         "date_service": date,
@@ -71,7 +71,7 @@ class anthem_xml_importer(xml_importer):
 
         rec = super().xml_to_record(row)
         
-        rec["claim_number"] = self.unpack_td(row[0])
+        rec["claim_id"] = self.unpack_td(row[0])
         rec["date_service"] = self.unpack_td(row[1])
         rec["for"]          = self.unpack_td(row[2])
         rec["type"]         = self.unpack_td(row[3])

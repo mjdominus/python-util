@@ -20,7 +20,7 @@ o `pay-bill` utility program
   * Parse dates as dates
     x They're still stored in the YAML file as YYYY-MM-DD strings
       Do you want them stored as date objects?  Naah, probably not.
-  * Strip quotes from claim numbers
+  * Strip quotes from claim IDs
   * Translate patient IDs?
   * Convert money amounts to numbers
 

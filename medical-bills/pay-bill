@@ -16,7 +16,7 @@ def prompt(prompt, default=None):
          return res
 
 def print_claim(rec):
-   print(rec["claim_number"], "for", rec["for"]);
+   print(rec["claim_id"], "for", rec["for"]);
    print(rec["doctor"], rec["date_service"]);
    print("  Billed: $" + rec["total"])
    print("    Owed: $" + rec["payable"])
@@ -33,11 +33,11 @@ elif len(argv) == 2:
 bdb = billdb(database_file)
 
 while True:
-   claim_number = prompt("Claim number? ")
-   if claim_number in bdb.db: break
-   print("Unrecognized claim number")
+   claim_id = prompt("Claim ID? ")
+   if claim_id is not None: break
+   print("Unrecognized claim ID")
    
-rec = bdb.db[claim_number]
+rec = bdb.db[claim_id]
 print_claim(rec)
 if rec["mystatus"] == "paid":
    print("** You already paid this claim!")
