@@ -74,9 +74,12 @@ class billdb():
         else:
             self.db[claim_id] = rec
             return "added"
+
+    def claim_ids(self):
+        return [ str(x) for x in self.db.keys() ]
     
     def get_claim(self, claim_id):
-        self.db.get(claim_id)
+        return self.db.get(claim_id)
 
     def has_claim(self, claim_id):
         return claim_id in self.db

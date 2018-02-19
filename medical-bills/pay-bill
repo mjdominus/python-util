@@ -1,53 +1,137 @@
 #!/usr/bin/python3
 
 from billdb import billdb
-from sys import argv, stdin
 import datetime
+import re
+import sys
 
-def prompt(prompt, default=None):
-   if default is not None:
-      prompt = prompt + "[" + default + "] "
+class pay_bill_app():
+    def __init__(self, path, inf=sys.stdin, outf=sys.stdout,
+                 interactive=False):
+       self.path = path
+       self.db = billdb(path)
+       self.inf = inf
+       self.outf = outf
+       self.interactive = interactive
+       self.selected_claim = None
+
+    def known_claim_ids(self):
+       return self.db.claim_ids()
+      
+    def locate_claim_id(self, pat):
+       known = self.known_claim_ids()
+       if pat in known: return pat
+
+       rx = re.compile(pat)
+       return self.menu([ x for x in known if rx.search(x) ])
+
+    def menu(self, items):
+       if len(items) == 0:
+          return None
+       elif len(items) == 1:
+          return items[0]
+
+       if not self.interactive:
+          raise Exception("ambiguous")
+
+       for i in range(len(items)):
+          self.emit(i + ":", items[i])
+       sel = None
+       while True:
+          sel = int(self.prompt("Which? "))
+          if sel >= 0 and sel < len(items):
+             return sel
+
+    def prompt(self, prompt, default=None):
+       if default is not None:
+          prompt = prompt + "[" + default + "] "
+       while True:
+          self.emit(prompt, end="", flush=True)
+          res = self.inf.readline().strip()
+          if res == "":
+             if default is not None: return default
+          else:
+             return res
+
+    def claim(self, claim_id):
+       return self.db.get_claim(claim_id)
+
+    def select_claim(self, claim_id):
+       self.selected_claim = self.claim(claim_id)
+       return self
+
+    def emit(self, *strs, **kwargs):
+       print(*strs, **kwargs, file=self.outf)
+       return self
+
+    def display_selected_claim(self):
+       rec = self.selected_claim
+       self.emit(rec["claim_id"], "for", rec["for"]);
+       self.emit(rec["doctor"], rec["date_service"]);
+       self.emit("  Billed: $" + rec["total"])
+       self.emit("    Owed: $" + rec["payable"])
+       self.emit("STATUS:", rec["mystatus"])
+
+    def selected_claim_is_paid(self):
+       return self.selected_claim["mystatus"] == "paid"
+
+    def mark_selected_claim_paid(self, **kwargs):
+       rec = self.selected_claim
+       for arg in ("check_amount", "date_paid",
+                   "check_number", "status"):
+          if arg not in kwargs or kwargs[arg] is None:
+             raise Exception("mark_selected_claim_paid: '%s' is required"
+                             % arg)
+          else:
+             rec[arg] = kwargs[arg]
+
+       rec["mystatus"] = rec["status"]; del rec["status"]
+       return self
+
+    def save(self):
+       self.db.save()
+
+
+def usage():
+   print("Usage: pay-bill [database-file]", file=sys.stderr)
+   exit(2)
+   
+if __name__ == '__main__':
+   from sys import argv
+   if len(argv) > 2:
+      usage()
+   elif len(argv) == 2:
+      database_file = argv[1]
+   elif len(argv) == 1:
+      database_file = "samples/test.bdb"
+
+   app = pay_bill_app(database_file, interactive=True)
+
    while True:
-      print(prompt, end="", flush=True)
-      res = stdin.readline().strip()
-      if res == "":
-         if default is not None: return default
-      else:
-         return res
+      claim_id = app.locate_claim_id(app.prompt("Claim ID? "))
+      if claim_id is not None: break
+      app.emit("Unrecognized claim ID")
 
-def print_claim(rec):
-   print(rec["claim_id"], "for", rec["for"]);
-   print(rec["doctor"], rec["date_service"]);
-   print("  Billed: $" + rec["total"])
-   print("    Owed: $" + rec["payable"])
-   print("STATUS:", rec["mystatus"])
-   
-   
-database_file = "/home/mjd/private/anthem.bdb"
-database_file = "samples/test.bdb"
-if len(argv) > 2:
-   usage()
-elif len(argv) == 2:
-   database_file = argv[1]
+   app.select_claim(claim_id).display_selected_claim()
 
-bdb = billdb(database_file)
+   if app.selected_claim_is_paid():
+      app.emit("** You already paid this claim!")
+      app.emit("  (Check number", app.selected_claim["check_number"],
+               "on", app.selected_claim["date_paid"] + ")")
+      exit(1)
 
-while True:
-   claim_id = prompt("Claim ID? ")
-   if claim_id is not None: break
-   print("Unrecognized claim ID")
-   
-rec = bdb.db[claim_id]
-print_claim(rec)
-if rec["mystatus"] == "paid":
-   print("** You already paid this claim!")
-   print("  (Check number", rec["check_number"], "on",
-         rec["date_paid"] + ")")
-   exit(1)
+   check_amount = app.prompt("Amount paid? ", app.selected_claim["payable"])
+   if check_amount == app.selected_claim["payable"]:
+      new_status = "paid"
+   else:
+      raise Exception("Partial payments not yet supported")
 
-rec["check_amount"] = prompt("Amount paid? ", rec["payable"])
-rec["date_paid"]    = prompt("Date paid? ", str(datetime.date.today()))
-rec["check_number"] = prompt("Check number? ")
-rec["mystatus"]     = prompt("New status? ", "paid")
-   
-bdb.save()
+   app.mark_selected_claim_paid(
+      check_amount = check_amount,
+      date_paid = app.prompt("Date paid? ", str(datetime.date.today())),
+      check_number = app.prompt("Check number? "),
+      status = app.prompt("New status? ", new_status))
+
+   app.save()
+   exit(0)
+

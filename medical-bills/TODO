@@ -8,7 +8,7 @@ o Advisory locking
 o `pay-bill` utility program
   * It can raise a flag: "hey, you already paid this!"
   o Needs better lookup mechanisms:
-    o Claim number prefix or suffix
+    * Claim number prefix or suffix
     o Date of service (with menu for ambiguous claims)
     o Doctor substring match (ditto)
 
@@ -46,3 +46,8 @@ o `import-claims` utility program
 * Break out XML importation into a separate object because it's not
   actually an XML importer, it's an Anthem Blue Cross XML format of
   the week importer
+
+o Slightly better configuration system.  Right now the path to the
+  database is hardwired into the import-xml and pay-bill tools.
+  Don't overdo this.
+
