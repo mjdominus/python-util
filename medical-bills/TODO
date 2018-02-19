@@ -1,0 +1,56 @@
+
+* Merge records when consistent!
+  * Move the merging logic into a separate object
+
+o Advisory locking
+    Do this later, you're the only one using this program
+    
+o `pay-bill` utility program
+  * It can raise a flag: "hey, you already paid this!"
+  o Needs better lookup mechanisms:
+    * Claim number prefix or suffix
+    o Date of service (with menu for ambiguous claims)
+    o Doctor substring match (ditto)
+  o Needs option for command-line argument claim numbers
+  o Needs option that says "these claim numbers were all paid at the
+    same time by the same check"
+
+o `import-claims` utility program
+   o Needs --verbose option
+   o XML importer needs its diagnostic messages to
+     include a filename if possible
+
+* Better field loading:
+  * This is in progress -- we now have an "xml_conversions"
+    table that says how to convert values in each field from XML to
+    internal format
+
+  * Parse dates as dates
+    x They're still stored in the YAML file as YYYY-MM-DD strings
+      Do you want them stored as date objects?  Naah, probably not.
+  * Strip quotes from claim IDs
+  * Translate patient IDs?
+  * Convert money amounts to numbers
+
+  * Move this logic into a separate object - it's specific to the
+    Anthem Blue Cross XML format of the week and should be specified
+    as such
+
+    * At the same time you can move those regexes and translation
+      tables into the conversion object
+
+    * Also it includes your family's names and birthdays so you
+      don't want to share it on Github
+
+* Don't let file objects go out of scope; use the
+        with open(...) as f:
+  pattern
+
+* Break out XML importation into a separate object because it's not
+  actually an XML importer, it's an Anthem Blue Cross XML format of
+  the week importer
+
+o Slightly better configuration system.  Right now the path to the
+  database is hardwired into the import-xml and pay-bill tools.
+  Don't overdo this.
+
