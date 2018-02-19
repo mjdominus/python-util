@@ -94,10 +94,17 @@ class billdb():
             return False
 
 
+    def import_xml_from_file(self, path):
+        recs = self.xml_importer.import_xml_from_file(path)
+        self.import_recs(recs)
+
     def import_xml(self, xml_file):
+        recs = self.xml_importer.import_xml(xml_file)
+        self.import_recs(recs)
+
+    def import_recs(self, recs):
         if self.rdonly:
             raise Exception("Can't import into read-only database")
-        recs = self.xml_importer.import_xml(xml_file)
         status = { "merged": 0, "added": 0, "failed": 0 }
         for rec in recs:
             result = self.add_record(rec)

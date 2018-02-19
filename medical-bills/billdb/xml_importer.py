@@ -9,12 +9,13 @@ class xml_importer():
         self.debug = debug
         self.conversions = {}
 
-    def import_xml(self, xmlfile):
-        if self.debug: print("Importing from", xmlfile)
-        tree = None
+    def import_xml_from_file(self, path):
+        if self.debug: print("Importing from", path)
         with open(xmlfile, mode='r') as f:
-            tree = self.parser.parse(f)
+            self.import_xml(f)
 
+    def import_xml(self, xmlfile):
+        tree = self.parser.parse(xmlfile)
         records = []
         for xml in tree.getroot():
             if self.skippable(xml): continue
