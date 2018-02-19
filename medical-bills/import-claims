@@ -1,0 +1,16 @@
+#!/usr/bin/python3
+
+from billdb import billdb
+from sys import argv, stdin
+
+database_file = "samples/test.bdb"
+bdb = billdb(database_file)
+
+if len(argv) == 1:
+   bdb.import_xml(stdin)
+else:
+   for path in argv[1:]:
+      bdb.import_xml(path)
+
+bdb.save()
+

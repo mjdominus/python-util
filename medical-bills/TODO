@@ -12,6 +12,11 @@ o `pay-bill` utility program
     o Date of service (with menu for ambiguous claims)
     o Doctor substring match (ditto)
 
+o `import-claims` utility program
+   o Needs --verbose option
+   o XML importer needs its diagnostic messages to
+     include a filename if possible
+
 * Better field loading:
   * This is in progress -- we now have an "xml_conversions"
     table that says how to convert values in each field from XML to
