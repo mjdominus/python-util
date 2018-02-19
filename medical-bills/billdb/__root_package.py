@@ -77,12 +77,19 @@ class billdb():
 
     def claim_ids(self):
         return [ str(x) for x in self.db.keys() ]
+
+    def all_claims(self):
+        return self.db.values()
     
     def get_claim(self, claim_id):
         return self.db.get(claim_id)
 
     def has_claim(self, claim_id):
         return claim_id in self.db
+
+    def find_claims(self, field, pat, case_insensitive=False):
+        return [ claim for claim in self.all_claims() if
+                 pat in claim[field] ]
 
     # Here we are presented with a new record
     # that has the same ID as an old record

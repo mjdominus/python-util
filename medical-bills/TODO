@@ -7,13 +7,17 @@ o Advisory locking
     
 o `pay-bill` utility program
   * It can raise a flag: "hey, you already paid this!"
-  o Needs better lookup mechanisms:
+  * Needs better lookup mechanisms:
     * Claim number prefix or suffix
-    o Date of service (with menu for ambiguous claims)
-    o Doctor substring match (ditto)
+    * Date of service (with menu for ambiguous claims)
+    * Doctor substring match (ditto)
   o Needs option for command-line argument claim numbers
   o Needs option that says "these claim numbers were all paid at the
     same time by the same check"
+  o More general mechanisms:
+    o What if I will never pay by check, say because the claim
+      represents a co-pay that was paid onsite?  Probably: Mark as
+      "paid", add a "NOTE: copay on-site" or something.
 
 o `import-claims` utility program
    o Needs --verbose option

@@ -17,6 +17,21 @@ class pay_bill_app():
 
     def known_claim_ids(self):
        return self.db.claim_ids()
+
+    def locate_claim_flexible(self, string):
+        guesses = []
+        if re.match('(\\d\\d\\d\\d-)\\d\\d-\\d\\d', string):
+            guesses = self.db.find_claims(field="date_service",
+                                          pat=string);
+        elif re.match('\\A\\d+\\Z', string):
+            guesses = self.db.find_claims(field="claim_id",
+                                          pat=string);
+        else:
+            guesses = self.db.find_claims(field="doctor",
+                                          pat=string,
+                                          case_insensitive=True)
+
+        return self.claim_menu(guesses)
       
     def locate_claim_id(self, pat):
        known = self.known_claim_ids()
@@ -24,6 +39,12 @@ class pay_bill_app():
 
        rx = re.compile(pat)
        return self.menu([ x for x in known if rx.search(x) ])
+
+    def claim_menu(self, claims):
+        pick = self.menu([ self.format_claim(claim, indent="  ")
+                           for claim in claims ])
+        if pick is None: return None
+        return claims[pick]
 
     def menu(self, items):
        if len(items) == 0:
@@ -35,7 +56,7 @@ class pay_bill_app():
           raise Exception("ambiguous")
 
        for i in range(len(items)):
-          self.emit(i + ":", items[i])
+          self.emit(str(i) + ":" + items[i])
        sel = None
        while True:
           sel = int(self.prompt("Which? "))
@@ -56,21 +77,28 @@ class pay_bill_app():
     def claim(self, claim_id):
        return self.db.get_claim(claim_id)
 
-    def select_claim(self, claim_id):
-       self.selected_claim = self.claim(claim_id)
+    def select_claim(self, claim):
+       self.selected_claim = claim
        return self
 
     def emit(self, *strs, **kwargs):
        print(*strs, **kwargs, file=self.outf)
        return self
 
-    def display_selected_claim(self):
-       rec = self.selected_claim
-       self.emit(rec["claim_id"], "for", rec["for"]);
-       self.emit(rec["doctor"], rec["date_service"]);
-       self.emit("  Billed: $" + rec["total"])
-       self.emit("    Owed: $" + rec["payable"])
-       self.emit("STATUS:", rec["mystatus"])
+    def display_selected_claim(self, indent=""):
+       self.display_claim(self.selected_claim, indent=indent)
+
+    def display_claim(self, claim, indent=""):
+       self.emit(self.format_claim(claim, indent=indent))
+
+    def format_claim(self, claim, indent=""):
+       lines = [
+           claim["claim_id"] + " for " + claim["for"],
+           claim["doctor"] + " " + str(claim["date_service"]),
+           "  Billed: $" + claim["total"],
+           "    Owed: $" + claim["payable"],
+           "STATUS:" + str(claim["mystatus"]) ]
+       return "".join([ indent + s + "\n" for s in lines ])
 
     def selected_claim_is_paid(self):
        return self.selected_claim["mystatus"] == "paid"
@@ -108,11 +136,11 @@ if __name__ == '__main__':
    app = pay_bill_app(database_file, interactive=True)
 
    while True:
-      claim_id = app.locate_claim_id(app.prompt("Claim ID? "))
-      if claim_id is not None: break
-      app.emit("Unrecognized claim ID")
+      claim = app.locate_claim_flexible(app.prompt("What bill? "))
+      if claim is not None: break
+      app.emit("No matching claims found")
 
-   app.select_claim(claim_id).display_selected_claim()
+   app.select_claim(claim).display_selected_claim()
 
    if app.selected_claim_is_paid():
       app.emit("** You already paid this claim!")
