@@ -11,6 +11,9 @@ o `pay-bill` utility program
     * Claim number prefix or suffix
     o Date of service (with menu for ambiguous claims)
     o Doctor substring match (ditto)
+  o Needs option for command-line argument claim numbers
+  o Needs option that says "these claim numbers were all paid at the
+    same time by the same check"
 
 o `import-claims` utility program
    o Needs --verbose option
