@@ -58,3 +58,10 @@ o Slightly better configuration system.  Right now the path to the
   database is hardwired into the import-xml and pay-bill tools.
   Don't overdo this.
 
+o Break out app utils from pay-bill into an apputils.py module.
+  Rewrite pay-bill to import it.  Then create:
+  o find-claim
+  o annotate-claim
+  o What else?
+
+
