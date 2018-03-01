@@ -20,10 +20,10 @@ class pay_bill_app():
 
     def locate_claim_flexible(self, string):
         guesses = []
-        if re.match('(\\d\\d\\d\\d-)\\d\\d-\\d\\d', string):
+        if re.match(r'(\d\d\d\d-)\d\d-\d\d', string):
             guesses = self.db.find_claims(field="date_service",
                                           pat=string);
-        elif re.match('\\A\\d+\\Z', string):
+        elif re.match(r'\A\d+\Z', string):
             guesses = self.db.find_claims(field="claim_id",
                                           pat=string);
         else:

@@ -9,7 +9,7 @@ class anthem_xml_importer(xml_importer):
 
     sq = str.maketrans("", "", "'")
     sc = str.maketrans("", "", ",")
-    money_pat = re.compile('\\A \\$ ( \\d+\\.\\d\\d ) \\Z', flags=re.VERBOSE)
+    money_pat = re.compile(r'\A \$ ( \d+\.\d\d ) \Z', flags=re.VERBOSE)
 
     def stripquotes(s):
         return s.translate(anthem_xml_importer.sq)
