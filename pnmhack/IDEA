@@ -1,0 +1,13 @@
+
+cut-chunk:
+   cut a chunk from image B that has the same aspect ratio as image A
+
+cut-chunk --aspect A --offset P --scale B
+
+  --aspect A : template image
+  --offset P : number of pixels offset:
+                 the cut image will be the full height of B, starting
+                 from X position P on the left, or the full width of
+                 B, starting from Y position P on top
+  --scale : scale the output to be the same size as B
+
