@@ -49,8 +49,11 @@ class Semantics:
   def number(self, ast):
     return float(ast)
 
+  def var(self, ast):
+    return self.vars[ast]
+
   def pi(self, ast):
-    return 3.14159;
+    return self.vars["π"];
 
   
         

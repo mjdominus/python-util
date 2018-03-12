@@ -10,7 +10,8 @@ if (len(sys.argv) > 1):
     print (parser.parse(" ".join(sys.argv[1:])))
 else:
     for line in fileinput.input():
-        print (parser.parse(line))
-
+        result = parser.parse(line)
+        print(result)
+        parser.set_var("it", result)
         
     

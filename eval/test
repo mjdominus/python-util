@@ -44,8 +44,8 @@ class TestExprs(unittest.TestCase):
         self.tryit("8÷4", 2)
 
     def test_pi(self):
-        self.closeEnough("π*2", 6.28318)
-        self.closeEnough("pi*2", 6.28318)
+        self.closeEnough("π*2", 6.283185307)
+        self.closeEnough("pi*2", 6.283185307)
 
     def test_pow(self):
         self.tryit("2^4", 16)

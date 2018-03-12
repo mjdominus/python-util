@@ -9,7 +9,21 @@ class Grammar():
 
     def __init__(self, semantics=Semantics()):
         self.semantics = semantics
-    
+        self.vars = Grammar.init_namespace()
+        self.semantics.vars = self.vars
+
+    def set_var(self, name, val):
+        self.vars[name] = val
+
+    @classmethod
+    def init_namespace(cls):
+        import math
+        return { "pi": math.atan2(0, -1),
+                 "π": math.atan2(0, -1),
+                 "it": None,
+                 "e": math.exp(1),
+                 }
+
     grammar = '''
 @@grammar::EVAL
 
@@ -37,8 +51,9 @@ base = number | compound_expression;
 
 compound_expression = '(' expression ')' ;
 
-number = /\d+/ | pi;
-pi = 'π' | 'pi';
+number = /\d+/ | pi | var;
+pi = 'π' ;
+var = ?'[a-zA-Z_]\w*';
 
 '''
 
