@@ -54,7 +54,10 @@ base = number | compound_expression;
 
 compound_expression = '(' expression ')' ;
 
-number = /\d+/ | pi | var;
+number = floatliteral | int | pi | var;
+int = /\d+/;
+floatliteral = [intpart:int] frac:decimal_frac;
+decimal_frac = /\.\d+/;
 pi = 'π' ;
 var = ?'[a-zA-Z_]\w*';
 

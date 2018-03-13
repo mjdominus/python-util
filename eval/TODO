@@ -2,7 +2,7 @@
 o Distinguish between ints and floats.
   Right now it seems to compute everything in floats.
 
-o Moreover it doesn't understand floats on _input_
+* Moreover it doesn't understand floats on _input_
 
 o Add named functions like sin() and int()
 

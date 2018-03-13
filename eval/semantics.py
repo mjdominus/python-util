@@ -73,7 +73,13 @@ class Semantics:
     return Var(name, self.env)
 
   def pi(self, ast):
-    return self.env["π"];
+    return self.env["π"]
+
+  def floatliteral(self, ast):
+    f = float(ast.frac)
+    if ast.intpart is not None:
+      f += float(ast.intpart)
+    return f
 
   def set_var(self, name, val):
     self.env[name] = val
