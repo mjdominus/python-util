@@ -52,6 +52,13 @@ class TestExprs(unittest.TestCase):
         self.tryit("2^2^3", 256)
         self.tryit("2^(2^3)", 256)
         self.tryit("((2^2)^3)", 64)
+
+    def test_assign(self):
+        self.tryit("a=7", 7)
+        self.tryit("a*2", 14)
+        self.tryit("b=(a*a)+a+3", 59)
+        self.tryit("d=e=f=12", 12)
+        self.tryit("d*10000+e*100+f", 121212)
         
 if __name__ == '__main__':
    unittest.main()

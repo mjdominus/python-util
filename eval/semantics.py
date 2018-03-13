@@ -12,6 +12,19 @@ else:
   def debug(*strings):
     pass
 
+
+class Var():
+  def __init__(self, name, env):
+    self.name = name
+    self.env = env
+
+  def get(self):
+    return self.env[self.name]
+
+  def set(self, val):
+    self.env[self.name] = val
+
+
 class Semantics:
   def expression(self, ast):
     debug("** expression: ", ast)
@@ -24,6 +37,10 @@ class Semantics:
         raise Exception("WTF", ast.op)
     else:
       return ast
+
+  def assignment(self, ast):
+    ast.left.set(ast.right)
+    return ast.right
 
   def term(self, ast):
     debug("** term: ", ast)
@@ -47,15 +64,16 @@ class Semantics:
       return ast
 
   def number(self, ast):
-    return float(ast)
+    if "get" in ast.__dir__():
+      return ast.get()
+    else:
+      return float(ast)
 
-  def var(self, ast):
-    return self.vars[ast]
+  def var(self, name):
+    return Var(name, self.env)
 
   def pi(self, ast):
-    return self.vars["π"];
+    return self.env["π"];
 
-  
-        
-
-  
+  def set_var(self, name, val):
+    self.env[name] = val

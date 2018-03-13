@@ -9,11 +9,10 @@ class Grammar():
 
     def __init__(self, semantics=Semantics()):
         self.semantics = semantics
-        self.vars = Grammar.init_namespace()
-        self.semantics.vars = self.vars
+        self.semantics.env = Grammar.init_namespace()
 
     def set_var(self, name, val):
-        self.vars[name] = val
+        self.semantics.set_var(name, val)
 
     @classmethod
     def init_namespace(cls):
@@ -29,9 +28,13 @@ class Grammar():
 
 start = expression $ ;
 
-expression = left:expression op:'+' right:term
+expression = assignment
+           | left:expression op:'+' right:term
            | left:expression op:'-' right:term
            | term
+;
+
+assignment = left:var '=' right:expression
 ;
 
 term =   
