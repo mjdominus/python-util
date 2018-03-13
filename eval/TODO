@@ -2,9 +2,13 @@
 o Distinguish between ints and floats.
   Right now it seems to compute everything in floats.
 
+o Moreover it doesn't understand floats on _input_
+
 o Add named functions like sin() and int()
 
 o Stream mode:  eval 'x*2 + y' is a filter that turns a two-column
   stdin into a one-column stdout.  Variable names are assigned to columns
   in alphabetical order; eval 'c1*2 + c2' is equivalent.
 
+o Add a '%' suffix operator that divides by 100.
+  Or maybe creates some special thingy so that 30 + 10% is 33 and 30 * 10% is 3.
