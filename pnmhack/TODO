@@ -1,0 +1,4 @@
+
+Filename construction adds a numeral but doesn't understand there
+might already be a numeral there.  A0001.png → A00010001.png
+
