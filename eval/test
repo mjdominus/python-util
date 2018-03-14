@@ -70,6 +70,15 @@ class TestExprs(unittest.TestCase):
         self.tryit("50 + 25%", 62.5)
         self.tryit("50 - 25%", 37.5)
         self.tryit("50 * 25%", 12.5)
+
+    def test_funcall(self):
+        self.tryit("sq(12)", 144)
+        self.tryit("int(4.3)", 4)
+        self.tryit("sqrt(400)", 20)
+        self.tryit("sin(pi/2)", 1)
+        self.tryit("cos(pi)", -1)
+        self.tryit("log(e^2.5)", 2.5)
+        self.tryit("log(exp(0.77))", 0.77)
         
 if __name__ == '__main__':
    unittest.main()

@@ -96,3 +96,8 @@ class Semantics:
 
   def percentage(self, ast):
     return Percentage(ast.val)
+
+  def funcall(self, ast):
+    f = ast.func.get()
+    return f(ast.arg)
+    

@@ -4,6 +4,7 @@ import tatsu    # parser generator library
 import pprint   # pretty-printer
 import reprlib
 from semantics import Semantics
+import math
 
 class Grammar():
 
@@ -21,7 +22,17 @@ class Grammar():
                  "π": math.atan2(0, -1),
                  "it": None,
                  "e": math.exp(1),
-                 }
+
+                 "sq": lambda x: x*x,
+                 "sqrt": math.sqrt,
+                 "sin": math.sin,
+                 "cos": math.cos,
+                 "tan": math.tan,
+                 "exp": math.exp,
+                 "log": math.log,
+
+                 "int": int,
+        }
 
     grammar = '''
 @@grammar::EVAL
@@ -50,9 +61,10 @@ factor =
     | left:base '^' right:factor
     | base; 
 
-base = percentage | number | compound_expression;
-
+base = funcall | percentage | number | compound_expression;
 compound_expression = '(' expression ')' ;
+
+funcall = func:var '(' arg:expression ')';
 
 percentage = val:(floatliteral | int) '%' ;
 
