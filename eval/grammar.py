@@ -50,9 +50,11 @@ factor =
     | left:base '^' right:factor
     | base; 
 
-base = number | compound_expression;
+base = percentage | number | compound_expression;
 
 compound_expression = '(' expression ')' ;
+
+percentage = val:(floatliteral | int) '%' ;
 
 number = floatliteral | int | pi | var;
 int = /\d+/;
