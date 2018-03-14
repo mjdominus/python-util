@@ -73,10 +73,8 @@ class Semantics:
       return ast
 
   def number(self, ast):
-    if "get" in ast.__dir__():
-      return ast.get()
-    else:
-      return float(ast)
+    try: return ast.get()
+    except: return ast
 
   def var(self, name):
     return Var(name, self.env)
@@ -89,6 +87,9 @@ class Semantics:
     if ast.intpart is not None:
       f += float(ast.intpart)
     return f
+
+  def int(self, ast):
+    return int(ast)
 
   def set_var(self, name, val):
     self.env[name] = val
