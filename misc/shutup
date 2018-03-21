@@ -3,13 +3,21 @@
 import sys
 import os
 
-def run_with_shut_up(command, *args, stdout=True, stderr=False):
-    devnull = open("/dev/null")
+def run_with_shut_up(command, *args, stdout=True, stderr=False, saved_stderr=None):
+    saved_exception = None
+    devnull = open("/dev/null", "w")
     if not stdout:
         os.dup2(devnull.fileno(), 1)
     if not stderr:
         os.dup2(devnull.fileno(), 2)
-    os.execlp(command, command, *args)
+    try: os.execlp(command, command, *args)
+    except OSError as err:
+        saved_exception = err
+        if saved_stderr is not None:
+            os.dup2(saved_stderr.fileno(), 2)
+
+    print("Couldn't run '{}': {}".format(command, saved_exception),
+          file=saved_stderr)
 
 def usage():
     print("Usage: shutup [-a] command args...",
@@ -23,6 +31,8 @@ if __name__ == '__main__':
     if len(argv) == 0: usage()
     elif argv[0] == '-a':
         show_stdout = False
-        argv = argv[:]
-    run_with_shut_up(*argv, stdout=show_stdout)
-    
+        argv = argv[1:]
+    saved_stderr = os.fdopen(os.dup(sys.stderr.fileno()), "w")
+    run_with_shut_up(*argv, saved_stderr=saved_stderr, stdout=show_stdout)
+    exit(1)                  # only if the exec fails
+
