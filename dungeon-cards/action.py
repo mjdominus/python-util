@@ -12,7 +12,7 @@ class action():
 
     def run(self, card):
         raise Exception("Abstract action can't be run")
-        
+
 # I'm on fire, lose 1 health or cancel myself
 class action_burn(action):
     def __init__(self):
@@ -113,4 +113,14 @@ class action_card_snuffed(action):
         pass
 
     def run(self, card, atype, amount=n):
+        pass
             
+class action_simple_coin(action):
+    def __init__(self):
+        pass
+
+    def run(self, card, atype):
+        GAME.score += 1
+        GAME.board.snuff(card)
+        
+    

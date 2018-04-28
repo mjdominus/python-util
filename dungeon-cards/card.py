@@ -1,15 +1,19 @@
 #!/usr/bin/python3
 
 import death_effect
-from game import GAME
 
 # Includes: monster, player, bomb, pickup, etc.
 
+# TODO : distinguish card from cardtype
+# kind and actions go into cardtype (I think)
+# health and location go into card
+
 class card():
-    def __init__(self, kind, health, location):
+    def __init__(self, game, kind, health, location=None):
+        self.g = game
         self.h = health
         self.attr = {} # tick is bomb tick count; sack is goblin sack contents
-        self.kind = kind
+        self.kind = kind # cardtype object
         self.loc = location
         self.actions = { "turn": [],  # Does this every turn
                          "death": [],  # Does this when it dies
@@ -37,5 +41,5 @@ class card():
 
     def replace_with(self, kind, health):
         loc = self.loc
-        new = card(kind, health, location=None)
-        GAME.board.set(loc, new)
+        new = card(self.g, kind, health, location=None)
+        self.g.board.set(loc, new)

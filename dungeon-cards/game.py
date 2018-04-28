@@ -1,10 +1,42 @@
 #!/usr/bin/python3
 
-import board
-import player
+from board import board
+from deck0 import deck
+from interactive_player import player
+from card import card
+from interactive_random import random
 
 class game():
     def __init__(self):
-        self.b = board()
-        self.rand = None   # actually prompts terminal for result
-        self.player = player()
+        self.board = board(self)
+        self.deck = deck(self)
+        self.random = random()
+        self.player = player(self)
+        self.player_card = card(self, "player", 10)
+        self.score = 0
+        self.turns = 0
+        self.game_over = False
+        self.player = player(self)
+
+    def initialize(self):
+        self.board.initialize(player=self.player_card)
+        self.player.initialize()
+
+    def play(self):
+        self.initialize()
+        while not self.game_over:
+            self.move()
+            self.turns += 1
+        self.report()
+
+    def move(self):
+        move = self.player.move()
+        if move.move_type == "move":
+            self.board.get(move.loc).run_actions("attacked")
+
+    def report(self):
+        print("You scored %d points in %d turns" % (self.score, self.turns))
+
+if __name__ == '__main__':
+    game().play()
+    

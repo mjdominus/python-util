@@ -3,22 +3,37 @@
 # Handles all queries about what is where
 # and _especially_ all requests to move things
 
+from loc import loc
+
 class board():
-    def __init__(self):
+    def __init__(self, game):
         self.b = [ [None, None, None],
                    [None, None, None],
                    [None, None, None],
                  ]
+        self.g = game
+
+    def initialize(self, player):
         for r in range(3):
             for c in range(3):
-                self.b[r][c] = GAME.random.random_card("Random card for (%d,%d)" % (r, c))
+                if r == 1 and c == 1:
+                    self.set(loc(r, c), player)
+                else:
+                    self.fill(loc(r, c))
+
+    def fill(self, loc):
+        self.set(loc, self.g.deck.deal())
 
     def find(self, what):
         for r in range(3):
             for c in range(3):
-                if self.b[r][c].kind_is(what):
-                    return (r,c)
+                a_loc = loc(r, c)
+                if self.get(a_loc).kind_is(what):
+                    return a_loc
         return None
+
+    def find_player(self):
+        return self.find("player")
 
     def swap(self, loc_1, loc_2):
         m1 = self.get(loc_1)
@@ -32,5 +47,19 @@ class board():
     def set(self, loc, m):
         self.b[loc.r][loc.c] = m
         m.moved(loc)
+
+    # move player to new position, eliminating
+    # the card that was there before
+    # this determines how the cards slide around when
+    # the player moves
+    def snuff(self, card):
+        delta = delta(player.loc, card.loc)
+        cur_loc = card.loc
+        while True:
+            next_loc = delta.add(cur_loc)
+            if not self.is_valid_loc(next_loc): break
+            self.set(next_loc, self.get(cur_loc))
+            cur_loc = next_loc
+        # At this point cur_loc needs to be filled with a new card
+        self.fill(cur_loc)
         
-    
