@@ -3,9 +3,9 @@
 import death_effect
 from game import GAME
 
-# Includes: player, bomb, pickup, etc.
+# Includes: monster, player, bomb, pickup, etc.
 
-class monster():
+class card():
     def __init__(self, kind, health, location):
         self.h = health
         self.attr = {} # tick is bomb tick count; sack is goblin sack contents
@@ -37,5 +37,5 @@ class monster():
 
     def replace_with(self, kind, health):
         loc = self.loc
-        new = monster(kind, health, location=None)
+        new = card(kind, health, location=None)
         GAME.board.set(loc, new)
