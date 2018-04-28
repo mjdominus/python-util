@@ -1,10 +1,13 @@
 #!/usr/bin/python3
 
-from grammar import Grammar
-import sys
 import fileinput
+import semexp
+from sgrammar import grammar
+import sys
+import tatsu
+from trivsem import trivsem
 
-parser = Grammar()
+parser = tatsu.compile(grammar, name="eval", semantics=trivsem())
 
 if (len(sys.argv) > 1):
     print (parser.parse(" ".join(sys.argv[1:])))
