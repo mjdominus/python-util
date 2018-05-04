@@ -19,8 +19,13 @@ o `pay-bill` utility program
       represents a co-pay that was paid onsite?  Probably: Mark as
       "paid", add a "NOTE: copay on-site" or something.
 
+      This is in progress now. I can make a partial payment and add a
+      note that says why the amounts differ.  It gets marked "paid" if
+      its fully-paid and "partial" if it really is only partially paid.
+
 o `import-claims` utility program
    o Needs --verbose option
+     At least to mention how many records were imported.
    o XML importer needs its diagnostic messages to
      include a filename if possible
 
@@ -64,4 +69,10 @@ o Break out app utils from pay-bill into an apputils.py module.
   o annotate-claim
   o What else?
 
+o Better work flow.  Typical example: Got three bills from labcorp.  I
+  would like to write a single check and mail it in a single
+  envelope.  Instead of having a single selected claim, pay-bill
+  should allow me to select several in sequence, and when I tell it
+  I'm done it should prompt me with the total amount and ask for the
+  check number.
 
