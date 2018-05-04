@@ -50,7 +50,7 @@ class pay_bill_app():
        if len(items) == 0:
           return None
        elif len(items) == 1:
-          return items[0]
+          return 0
 
        if not self.interactive:
           raise Exception("ambiguous")
