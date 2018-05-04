@@ -74,6 +74,12 @@ class pay_bill_app():
           else:
              return res
 
+    def yesno(self, prompt, default=None):
+        while True:
+            res = self.prompt(prompt, default).lower()
+            if   res == 'y' or res == 'yes': return True
+            elif res == 'n' or res == 'no': return False
+
     def claim(self, claim_id):
        return self.db.get_claim(claim_id)
 
@@ -164,7 +170,11 @@ if __name__ == '__main__':
    if check_amount == app.selected_claim["payable"]:
       new_status = "paid"
    else:
-      raise Exception("Partial payments not yet supported")
+       if app.yesno("Is this a complete payment?"):
+           new_status = "paid"
+       else:
+           new_status = "partial"
+       note = app.prompt("Any explanation needed?", default=None)
 
    app.mark_selected_claim_paid(
       check_amount = check_amount,
