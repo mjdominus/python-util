@@ -89,7 +89,7 @@ class billdb():
 
     def find_claims(self, field, pat, case_insensitive=False):
         return [ claim for claim in self.all_claims() if
-                 pat in claim[field] ]
+                 pat in str(claim[field]) ]
 
     # Here we are presented with a new record
     # that has the same ID as an old record
@@ -99,8 +99,8 @@ class billdb():
             self.db[id] = self.conflict_resolver.merge(self.db[id], new)
             return True
         except ResolutionException as exc:
-            print("Record <%s> has a conflicting '%s' value <%s>; was <%s>; ignoring!" %
-                  (id, exc.field, exc.old, exc.new))
+            print("Record <%s> has a conflicting '%s' value <%s>; keeping old value <%s>" %
+                  (id, exc.field, exc.new, exc.old))
             return False
 
 

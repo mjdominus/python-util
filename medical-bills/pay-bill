@@ -50,7 +50,7 @@ class pay_bill_app():
        if len(items) == 0:
           return None
        elif len(items) == 1:
-          return items[0]
+          return 0
 
        if not self.interactive:
           raise Exception("ambiguous")
@@ -73,6 +73,12 @@ class pay_bill_app():
              if default is not None: return default
           else:
              return res
+
+    def yesno(self, prompt, default=None):
+        while True:
+            res = self.prompt(prompt, default).lower()
+            if   res == 'y' or res == 'yes': return True
+            elif res == 'n' or res == 'no': return False
 
     def claim(self, claim_id):
        return self.db.get_claim(claim_id)
@@ -98,6 +104,8 @@ class pay_bill_app():
            "  Billed: $" + claim["total"],
            "    Owed: $" + claim["payable"],
            "STATUS:" + str(claim["mystatus"]) ]
+       if "note" in claim:
+           lines.append("NOTE: " + claim["note"])
        return "".join([ indent + s + "\n" for s in lines ])
 
     def selected_claim_is_paid(self):
@@ -113,6 +121,9 @@ class pay_bill_app():
           else:
              rec[arg] = kwargs[arg]
 
+       if "note" in kwargs and kwargs["note"] is not null:
+           rec["note"] = rec.get("note", "") + kwargs["note"]
+       
        rec["mystatus"] = rec["status"]; del rec["status"]
        return self
 
@@ -148,17 +159,29 @@ if __name__ == '__main__':
                "on", app.selected_claim["date_paid"] + ")")
       exit(1)
 
+   if float(claim["payable"]) == 0:
+      app.emit("** No balance on this claim")
+      claim["mystatus"] = "zero-balance"
+      app.save()
+      exit(0)
+
    check_amount = app.prompt("Amount paid? ", app.selected_claim["payable"])
+   note = None
    if check_amount == app.selected_claim["payable"]:
       new_status = "paid"
    else:
-      raise Exception("Partial payments not yet supported")
+       if app.yesno("Is this a complete payment?"):
+           new_status = "paid"
+       else:
+           new_status = "partial"
+       note = app.prompt("Any explanation needed?", default=None)
 
    app.mark_selected_claim_paid(
       check_amount = check_amount,
       date_paid = app.prompt("Date paid? ", str(datetime.date.today())),
       check_number = app.prompt("Check number? "),
-      status = app.prompt("New status? ", new_status))
+      status = app.prompt("New status? ", new_status),
+      note = app.prompt("Note? ", default=note))
 
    app.save()
    exit(0)
