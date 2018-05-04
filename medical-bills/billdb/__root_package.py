@@ -99,8 +99,8 @@ class billdb():
             self.db[id] = self.conflict_resolver.merge(self.db[id], new)
             return True
         except ResolutionException as exc:
-            print("Record <%s> has a conflicting '%s' value <%s>; was <%s>; ignoring!" %
-                  (id, exc.field, exc.old, exc.new))
+            print("Record <%s> has a conflicting '%s' value <%s>; keeping old value <%s>" %
+                  (id, exc.field, exc.new, exc.old))
             return False
 
 
