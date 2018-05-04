@@ -153,6 +153,12 @@ if __name__ == '__main__':
                "on", app.selected_claim["date_paid"] + ")")
       exit(1)
 
+   if float(claim["payable"]) == 0:
+      app.emit("** No balance on this claim")
+      claim["mystatus"] = "zero-balance"
+      app.save()
+      exit(0)
+
    check_amount = app.prompt("Amount paid? ", app.selected_claim["payable"])
    note = None
    if check_amount == app.selected_claim["payable"]:
