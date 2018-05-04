@@ -98,6 +98,8 @@ class pay_bill_app():
            "  Billed: $" + claim["total"],
            "    Owed: $" + claim["payable"],
            "STATUS:" + str(claim["mystatus"]) ]
+       if "note" in claim:
+           lines.append("NOTE: " + claim["note"])
        return "".join([ indent + s + "\n" for s in lines ])
 
     def selected_claim_is_paid(self):
@@ -113,6 +115,9 @@ class pay_bill_app():
           else:
              rec[arg] = kwargs[arg]
 
+       if "note" in kwargs and kwargs["note"] is not null:
+           rec["note"] = rec.get("note", "") + kwargs["note"]
+       
        rec["mystatus"] = rec["status"]; del rec["status"]
        return self
 
@@ -149,6 +154,7 @@ if __name__ == '__main__':
       exit(1)
 
    check_amount = app.prompt("Amount paid? ", app.selected_claim["payable"])
+   note = None
    if check_amount == app.selected_claim["payable"]:
       new_status = "paid"
    else:
@@ -158,7 +164,8 @@ if __name__ == '__main__':
       check_amount = check_amount,
       date_paid = app.prompt("Date paid? ", str(datetime.date.today())),
       check_number = app.prompt("Check number? "),
-      status = app.prompt("New status? ", new_status))
+      status = app.prompt("New status? ", new_status),
+      note = app.prompt("Note? ", default=note))
 
    app.save()
    exit(0)
