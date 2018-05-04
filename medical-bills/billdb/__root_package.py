@@ -89,7 +89,7 @@ class billdb():
 
     def find_claims(self, field, pat, case_insensitive=False):
         return [ claim for claim in self.all_claims() if
-                 pat in claim[field] ]
+                 pat in str(claim[field]) ]
 
     # Here we are presented with a new record
     # that has the same ID as an old record
