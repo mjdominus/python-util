@@ -4,6 +4,7 @@
 # and _especially_ all requests to move things
 
 from loc import loc
+from delta import delta
 
 class board():
     def __init__(self, game):
@@ -52,14 +53,18 @@ class board():
     # the card that was there before
     # this determines how the cards slide around when
     # the player moves
-    def snuff(self, card):
-        delta = delta(player.loc, card.loc)
+    def snuff_me(self, card):
+        d = delta(self.g.player_card.loc, card.loc)
         cur_loc = card.loc
         while True:
-            next_loc = delta.add(cur_loc)
+            next_loc = d.add(cur_loc)
             if not self.is_valid_loc(next_loc): break
             self.set(next_loc, self.get(cur_loc))
             cur_loc = next_loc
         # At this point cur_loc needs to be filled with a new card
         self.fill(cur_loc)
         
+
+    def is_valid_loc(self, loc):
+        return loc.r >= 0 and loc.r < 3 \
+           and loc.c >= 0 and loc.c < 3

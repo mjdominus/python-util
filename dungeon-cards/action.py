@@ -3,18 +3,17 @@
 # Some sort of per-turn action
 
 import filter
-from game import GAME
 
 # abstract
 class action():
-    def __init__(self):
-        pass
+    def __init__(self, game):
+        self.g = game
 
     def run(self, card):
         raise Exception("Abstract action can't be run")
 
 # I'm on fire, lose 1 health or cancel myself
-class action_burn(action):
+class burn(action):
     def __init__(self):
         pass
     def run(self, card, atype):
@@ -25,33 +24,33 @@ class action_burn(action):
 
 # This is what happens to a tree card
 # when it is hist with a flame trap
-class action_catch_fire(action):
+class catch_fire(action):
     def __init__(self):
         pass
     def run(self, card, atype):
-        card.add_action("turn", action_burn())
-    
+        card.add_action("turn", action.action_burn())
+
 # Tentacle card teleport
-class action_move(action):
+class move(action):
     def __init__(self):
         pass
 
     def run(self, card, atype):
         locations = filter(card.location().neighbors(),
-                           lambda loc : not GAME.board.contents(loc).kind_is("player"))
-        new_loc = GAME.random.select(locations)
-        GAME.board.swap(card.loc, new_loc)
-        
-class action_player_move(action):
+                           lambda loc : not card.g.board.contents(loc).kind_is("player"))
+        new_loc = card.g.random.select(locations)
+        card.g.board.swap(card.loc, new_loc)
+
+class player_move(action):
     def __init__(self):
         pass
 
     def run(self, card, atype):
-        new_loc = GAME.get_player_move()
-        GAME.board.move_player(new_loc)
+        new_loc = card.g.get_player_move()
+        card.g.board.move_player(new_loc)
 
-# Bomb counts down by 1        
-class action_tick(action):
+# Bomb counts down by 1
+class tick(action):
     def __init__(self):
         pass
 
@@ -61,66 +60,74 @@ class action_tick(action):
             card.run_actions("tick0")
 
 # Goblin steals adjacent gold (how much??)
-class action_steal(action):
+class steal(action):
     def __init__(self):
         pass
 
     def run(self, card, atype):
         locations = filter(card.location().neighbors(),
-                           lambda loc : not GAME.board.contents(loc).kind_is("gold"))
+                           lambda loc : not card.g.board.contents(loc).kind_is("gold"))
         if locations:
-            gold_loc = GAME.random.select(locations)
-            gold = GAME.board.get(gold_loc)
-            amount_stolen = GAME.random.amount(1, gold.h)
-            gold.hit(amount)
-            card.attr["sack"] += amount
+            gold_loc = card.g.random.select(locations)
+            gold = card.g.board.get(gold_loc)
+            amount_stolen = card.g.random.amount(1, gold.h)
+            gold.hit(amount_stolen)
+            card.attr["sack"] += amount_stolen
 
 # Gold is stolen-from by goblin
-class action_stolen(action):
+class stolen(action):
     def __init__(self):
         pass
 
-    def run(self, card, atype, amount=n):
-        card.h -= n
+    def run(self, card, atype, amount):
+        card.h -= amount
         if card.h == 0:
             card.replace_with("empty", 0)
 
 # This is a card informing us that the player is moving into our square
-class action_card_attacked(action):
+class card_attacked(action):
     def __init__(self):
         pass
 
     def run(self, card, atype):
-        player = GAME.player
+        player = card.g.player
         weapon = player.weapon
-        attack = weapon.strength if weapon else GAME.player.h
+        attack = weapon.strength if weapon else card.g.player.h
         defense = card.h
         points = attack if attack < defense else defense
         if weapon:
             weapon.damage(points)
         else:
-            GAME.player.damage(points)
+            card.g.player.damage(points)
         card.damage(points)
         if card.h == 0:
             # dead
             if weapon:
                 card.replace_with_gold()
             else:
-                ... ??
+                raise Exception("unimplemented")
 
-class action_card_snuffed(action):
-    def __init__(self):
-        pass
-
-    def run(self, card, atype, amount=n):
-        pass
-            
-class action_simple_coin(action):
+class card_snuffed(action):
     def __init__(self):
         pass
 
     def run(self, card, atype):
-        GAME.score += 1
-        GAME.board.snuff(card)
-        
-    
+        card.g.board.snuff_me(self)
+
+class simple_coin(action):
+    def __init__(self):
+        pass
+
+    def run(self, card, atype):
+        card.g.score += 1
+        card.g.board.snuff_me(card)
+
+class simple_trap(action):
+    def __init__(self):
+        pass
+
+    def run(self, card, atype):
+        card.g.player_card.wound(1)
+        card.g.board.snuff_me(card)
+
+import action

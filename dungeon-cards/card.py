@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 
-import death_effect
+from cardtype import card_library
 
 # Includes: monster, player, bomb, pickup, etc.
 
@@ -13,33 +13,45 @@ class card():
         self.g = game
         self.h = health
         self.attr = {} # tick is bomb tick count; sack is goblin sack contents
-        self.kind = kind # cardtype object
+        self.name = kind # cardtype object
+        self.type = card_library[kind]
         self.loc = location
-        self.actions = { "turn": [],  # Does this every turn
-                         "death": [],  # Does this when it dies
-                         "attacked": [],    # Does this when attacked
-                         "flamed": [], # Does this when burnt
-                         "poisoned": [], # Does this when poisoned
-                         "tick0": [], # Does this when times runs out
-        }
+
+    def desc(self):
+        return self.name + "(health %d)" % self.h
+
+    def announce(self, *msgs):
+      desc = self.desc()
+      for msg in msgs:
+          print(desc + ":", msg)
 
     def remove_action(self, action_type, action):
-        self.actions[action_type].remove(action)
+        self.name.actions[action_type].remove(action)
 
     def add_action(self, action_type, action):
-        self.actions[action_type].append(action)
+        self.name.actions[action_type].append(action)
 
     def run_actions(self, action_type):
-        for action in self.actions[action_type]:
+        self.announce("attacked")
+        for action in self.type.actions[action_type]:
             action.run(self, action_type)
             
     def kind_is(self, what):
-        return self.kind == what
+        return self.name == what
 
     def moved(self, loc):
-        self.loc = loc
+      self.announce("moved to %s" % str(loc))
+      self.loc = loc
 
     def replace_with(self, kind, health):
         loc = self.loc
         new = card(self.g, kind, health, location=None)
         self.g.board.set(loc, new)
+
+    def wound(self, points):
+      self.announce("wounded %d" % points)
+      self.h -= points
+      if points <= 0:
+        self.run_actions("die")
+
+
