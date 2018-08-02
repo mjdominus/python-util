@@ -22,8 +22,7 @@ def vec(N, max_i):
 # pad seq with zeroes until seq[i] exists, then increment seq[i]
 # There must be a better way to do this
 def force_inc(seq, i):
-    while i not in range(len(seq)):
-        seq += [0]
+    seq.extend((0,) * (i - len(seq) + 1))
     seq[i] += 1
 
 from sys import argv, stderr
