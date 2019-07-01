@@ -1,0 +1,10 @@
+ACTION=="remove", GOTO="mjd_end"
+# KERNEL!="event*", GOTO="mjd_end"
+ENV{ID_INPUT_MOUSE}=="", GOTO="mjd_end"
+
+# mouse:<subsystem>:v<vid>p<pid>:name:<name>:*
+KERNELS=="input*", ENV{ID_BUS}=="usb", \
+        RUN{program}="/tmp/mjd-event $devpath"
+        GOTO="mjd_end"
+
+LABEL="mjd_end"
